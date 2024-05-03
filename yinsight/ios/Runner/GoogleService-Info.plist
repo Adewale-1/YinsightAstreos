@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>196058467173-gapojldkdb0ulupk8bpbm5d0vjan416u.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.196058467173-gapojldkdb0ulupk8bpbm5d0vjan416u</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>196058467173-a7mgmkn61ql4heclqqra402971iflp41.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyBLip5B6dkkJa5GMB_wT3nUUvIgdh-53rM</string>
+	<key>GCM_SENDER_ID</key>
+	<string>196058467173</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.astreos.yinsight</string>
+	<key>PROJECT_ID</key>
+	<string>micro-atrium-416500</string>
+	<key>STORAGE_BUCKET</key>
+	<string>micro-atrium-416500.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:196058467173:ios:68fddab4264528e5fdaf8c</string>
+</dict>
+</plist>

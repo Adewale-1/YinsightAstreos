@@ -1,0 +1,82 @@
+{
+  "project_info": {
+    "project_number": "196058467173",
+    "project_id": "micro-atrium-416500",
+    "storage_bucket": "micro-atrium-416500.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:196058467173:android:9b2c13f44359ecc4fdaf8c",
+        "android_client_info": {
+          "package_name": "com.astreos.yinsight"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "196058467173-1got12ckrrbn3b37r46bg7tbnn7jrgmi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAu8r9Vwb2_VcGM726yR6eyqtNMqprkVy0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "196058467173-1got12ckrrbn3b37r46bg7tbnn7jrgmi.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "196058467173-148ig2rp34ohb0bqvdofc3dgk9ljbvri.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.astreos10.yinsight"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:196058467173:android:e6b21ddaa675d79dfdaf8c",
+        "android_client_info": {
+          "package_name": "com.astreos1.yinsight"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "196058467173-1got12ckrrbn3b37r46bg7tbnn7jrgmi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAu8r9Vwb2_VcGM726yR6eyqtNMqprkVy0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "196058467173-1got12ckrrbn3b37r46bg7tbnn7jrgmi.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "196058467173-148ig2rp34ohb0bqvdofc3dgk9ljbvri.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.astreos10.yinsight"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
