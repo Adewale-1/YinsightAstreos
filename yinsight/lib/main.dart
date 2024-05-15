@@ -48,6 +48,9 @@ void main() async {
    FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
 }
 
+
+
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 

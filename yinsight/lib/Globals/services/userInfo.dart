@@ -5,7 +5,6 @@ import 'package:http/http.dart' as http;
 
 class UserInformation{
 
-
   // static const http_endpoint = 'http://192.168.0.217:8080';
   static const http_endpoint = 'https://micro-atrium-416500.uc.r.appspot.com/';
   // static const http_endpoint = 'http://172.31.25.102:8080';
