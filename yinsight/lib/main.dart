@@ -12,10 +12,11 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:yinsight/navigationBar.dart';
 import 'firebase_options.dart';
 
-
+/// The main entry point of the application.
 void main() async {
 
   WidgetsFlutterBinding.ensureInitialized();
+  // Initialize Awesome Notifications
   await AwesomeNotifications().initialize(
     null,
     [
@@ -35,23 +36,28 @@ void main() async {
       )
     ],
   );
+  // Check notification permission
   bool isAllowedToSendNotifictions = await AwesomeNotifications().isNotificationAllowed();
   if (!isAllowedToSendNotifictions) {
     await AwesomeNotifications().requestPermissionToSendNotifications();
   }
+  // Initialize Firebase
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  // Run the app
   runApp(const ProviderScope(
     child: MyApp(),
   ));
-   FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+  // Handle Flutter errors with Firebase Crashlytics
+  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
 }
 
 
 
-
+/// The main application widget.
 class MyApp extends StatelessWidget {
+  /// Creates a [MyApp] widget.
   const MyApp({super.key});
 
   @override

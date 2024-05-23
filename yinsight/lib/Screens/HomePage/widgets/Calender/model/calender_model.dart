@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 
-
+/// A class representing a calendar event.
 class CalendarEvent {
   String title;
   String note;
@@ -14,7 +14,18 @@ class CalendarEvent {
   String recurrence;
   Color color;
 
-
+  /// Creates a [CalendarEvent] instance.
+  ///
+  /// [title]: The title of the event.
+  /// [note]: Additional notes for the event.
+  /// [startDateTime]: The start date and time of the event.
+  /// [endDateTime]: The end date and time of the event.
+  /// [reminder]: The reminder time before the event starts, in minutes.
+  /// [priority]: The priority of the event.
+  /// [expected_time_to_complete]: The expected time to complete the event.
+  /// [actual_time_to_complete]: The actual time taken to complete the event.
+  /// [recurrence]: The recurrence pattern of the event.
+  /// [color]: The color associated with the event.
   CalendarEvent({
     required this.title,
     required this.note,
@@ -28,8 +39,18 @@ class CalendarEvent {
     required this.color,
     
   });
-  factory CalendarEvent.fromJson(Map<String, dynamic> json) {
 
+  /// Creates a [CalendarEvent] instance from a JSON object.
+  ///
+  /// [json]: The JSON object to parse.
+  ///
+  /// Returns the parsed [CalendarEvent] instance.
+  factory CalendarEvent.fromJson(Map<String, dynamic> json) {
+    /// Parses a color string into a [Color] object.
+    ///
+    /// [colorStr]: The color string to parse.
+    ///
+    /// Returns the parsed [Color] object.
     Color parseColor(String colorStr) {
       try {
         return Color(int.parse(colorStr));
@@ -38,7 +59,12 @@ class CalendarEvent {
       }
     } 
 
-
+    /// Constructs a date-time string from a date and time.
+    ///
+    /// [date]: The date part of the string.
+    /// [time]: The time part of the string.
+    ///
+    /// Returns the constructed date-time string.
     String constructDateTimeString(String date, String? time) {
       // Assign a default value if time is null or empty
       const defaultTime = "00:00:00";

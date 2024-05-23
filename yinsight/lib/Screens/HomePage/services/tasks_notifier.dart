@@ -7,13 +7,14 @@ import 'package:yinsight/Screens/HomePage/models/task_model.dart';
 import 'package:http/http.dart' as http;
 
 
-
+/// A provider for managing task states.
 final tasksProvider = StateNotifierProvider<TasksNotifier, List<Task>>((ref) {
   return TasksNotifier();
 });
 
+/// A class for managing tasks with state management.
 class TasksNotifier extends StateNotifier<List<Task>> {
-  // TasksNotifier() : super([]);
+    /// Creates a [TasksNotifier] instance.
     TasksNotifier() : super([]) {
         fetchTasksFromBackend();
     }
@@ -21,7 +22,7 @@ class TasksNotifier extends StateNotifier<List<Task>> {
 
 
 
-
+  /// Fetches tasks from the backend.
   Future<void> fetchTasksFromBackend() async {
     try {
       final user = FirebaseAuth.instance.currentUser;
@@ -51,13 +52,16 @@ class TasksNotifier extends StateNotifier<List<Task>> {
     fetchTasksFromBackend();
   }
   
-
+  /// Adds a task to the state.
+  ///
+  /// [task]: The task to add.
   void addTask(Task task) {
     state = [...state, task];
   }
   
   
   List<Task> _originalList = [];
+
   void removeTaskFromList(String taskId) {
     state = state.where((task) => task.id != taskId).toList();
   }
@@ -94,18 +98,11 @@ class TasksNotifier extends StateNotifier<List<Task>> {
       return t;
     }).toList();
       
-      // Update the calendarTasksProvider state
-      // Access the current state of calendarTasksProvider
-      // final calendarTasksNotifier = ref.read(calendarTasksProvider.notifier);
-      // calendarTasksNotifier.addTaskToCalendar(task, timeForSlot);
+      ref.read(calendarTasksProvider.notifier).addTaskToCalendar(task, timeForSlot);
 
-      // ref.read(calendarTasksProvider.notifier).addTaskToCalendar(task, timeForSlot);
-      // print("State updated, current tasks: ${state.length}");
-        ref.read(calendarTasksProvider.notifier).addTaskToCalendar(task, timeForSlot);
-
-  // Notify the tasksProvider and calendarTasksProvider of the changes
-  ref.invalidate(tasksProvider);
-  ref.invalidate(calendarTasksProvider);
+      // Notify the tasksProvider and calendarTasksProvider of the changes
+      ref.invalidate(tasksProvider);
+      ref.invalidate(calendarTasksProvider);
       // Notify listeners to rebuild widgets
       state = List.from(state);
     }

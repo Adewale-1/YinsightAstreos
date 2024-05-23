@@ -5,6 +5,7 @@ import 'package:yinsight/Globals/services/userInfo.dart';
 
 import 'package:yinsight/Screens/HomePage/widgets/settings.dart';
 
+/// A widget to display the user's avatar and name.
 class AvatarWidget extends StatelessWidget {
   AvatarWidget({super.key});
   UserInformation userInformation = UserInformation();

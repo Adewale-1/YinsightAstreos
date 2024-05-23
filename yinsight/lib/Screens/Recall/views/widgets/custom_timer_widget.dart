@@ -1,12 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+/// A custom timer widget that displays a countdown timer with a circular progress indicator.
 class CustomTimerWidget extends StatelessWidget {
+  /// The remaining time in seconds.
   final int remainingTime;
+
+  /// The radius of the circular progress indicator.
   final double radius;
+  /// The background color of the circular progress indicator.
   final Color backgroundColor;
+
+  /// The color of the progress value in the circular progress indicator.
   final Color valueColor;
 
+  /// Creates a [CustomTimerWidget] with the specified properties.
+  ///
+  /// [remainingTime]: The remaining time in seconds.
+  /// [radius]: The radius of the circular progress indicator. Defaults to 110.0.
+  /// [backgroundColor]: The background color of the circular progress indicator. Defaults to [Colors.grey].
+  /// [valueColor]: The color of the progress value in the circular progress indicator. Defaults to [Colors.blue].
   const CustomTimerWidget({super.key, 
     required this.remainingTime,
     this.radius = 110.0,

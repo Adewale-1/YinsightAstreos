@@ -3,12 +3,11 @@ import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 
-class UserInformation{
-
+/// A class to handle user information and related operations.
+class UserInformation {
   // static const http_endpoint = 'http://192.168.0.217:8080';
   static const http_endpoint = 'https://micro-atrium-416500.uc.r.appspot.com/';
   // static const http_endpoint = 'http://172.31.25.102:8080';
-
 
   static final Map<String, String> routes = {
     'signup': '/signup',
@@ -20,19 +19,18 @@ class UserInformation{
     'getTotalTimeSpentForTask': '/getTotalTimeSpentForTask',
     //////////////////////////////////////////////
 
-
     'recallFileUpload': '/questions/uploadPDFs',
     'getPDFs': '/questions/getPDFs',
     'generateQuestions': '/questions/generate',
     'retreiveQuestions': '/questions/retreive',
     //////////////////////////////////////////////
-    
+
     'updateISOCalendar': '/updateISOCalendar',
     'events': '/events',
     'getName': '/getName',
     'deletePDF': '/deletePDF',
     'getCreatedTasks': '/getAllTasks',
-    
+
     'getAllEventsFromUploadedCalendar': '/getAllEventsFromUploadedCalendar',
     'addTaskToHomeCalendar': '/addTaskToHomeCalendar',
     'getDateFilteredTasksInHomeCalendar': '/getDateFilteredTasksInHomeCalendar',
@@ -41,7 +39,7 @@ class UserInformation{
     'getEvents': '/getAllTasks',
     // 'fetchEvents': '/fetchEvents',
     /////////////////////////////////
-    
+
     'NumberOfTasksCreated': '/getNumberOfTasksCreated',
     'uploadProfilePicture': '/updateProfilePic',
     'getProfilePicture': '/getProfilePic',
@@ -50,23 +48,22 @@ class UserInformation{
     ////////////////////////////
   };
 
-  /* 
-    This function is used to get the route for the given route name
-  */
+  /// Gets the route for the given key.
+  ///
+  /// [key]: The key for the desired route.
+  ///
+  /// Returns the route as a string.
   static String getRoute(String key) {
-
-    if (routes.containsKey(key)){
+    if (routes.containsKey(key)) {
       return http_endpoint + routes[key]!;
-    }
-    else{
+    } else {
       throw Exception('Route not found');
     }
   }
 
-
-  /* 
-    This function is used to get the saved user image
-  */
+  /// Retrieves the user's profile picture from the server.
+  ///
+  /// Returns the URL of the profile picture if successful, otherwise an error message.
   static Future<String> getUserImage() async {
     try {
       final user = FirebaseAuth.instance.currentUser;
@@ -83,13 +80,14 @@ class UserInformation{
         const Duration(seconds: 30),
         onTimeout: () {
           // Time has run out, do what you wanted to do.
-          return http.Response('Error', 408); // Request Timeout response status code
+          return http.Response(
+              'Error', 408); // Request Timeout response status code
         },
       );
 
       if (response.statusCode == 200) {
         var data = json.decode(response.body);
-        
+
         return data["profile_picture"];
       } else {
         // Handle errors or invalid status codes
@@ -102,22 +100,21 @@ class UserInformation{
     }
   }
 
-  /* Fetch User Data */
+  /// Fetches the user data from the server.
+  ///
+  /// Returns the user data as a string if successful, otherwise an error message.
   Future<String> fetchUserData() async {
     // await Future.delayed(Duration(milliseconds: 250));
 
     try {
-      
       final user = FirebaseAuth.instance.currentUser;
-      String? token = await user?.getIdToken(); 
-
+      String? token = await user?.getIdToken();
 
       // print("Token: $token");
       if (token == null) throw Exception('No token found');
       // print("Token: $token");
       var response = await http.get(
         Uri.parse(UserInformation.getRoute('getName')),
-
         headers: {
           'Authorization': token, // Include the token in the request header
         },
@@ -125,18 +122,19 @@ class UserInformation{
         const Duration(seconds: 30),
         onTimeout: () {
           // Time has run out, do what you wanted to do.
-          return http.Response('Error', 408); // Request Timeout response status code
+          return http.Response(
+              'Error', 408); // Request Timeout response status code
         },
       );
 
       if (response.statusCode == 200) {
-
         var data = json.decode(response.body);
-        String message = data["message"]; // Or however you're parsing the username
+        String message =
+            data["message"]; // Or however you're parsing the username
         return message; // Return the fetched username
       } else {
         // Handle errors or invalid status codes
-        // print("Error fetching user data: ${response.body}"); 
+        // print("Error fetching user data: ${response.body}");
         return "Error fetching user data"; // Return a default or error message
       }
     } catch (e) {
@@ -144,9 +142,7 @@ class UserInformation{
       return "Error fetching user data"; // Return a default or error message in case of exception
     }
   }
-
 }
-
 
 // http.get(Uri.parse('url')).timeout(
 //   const Duration(seconds: 1),
@@ -155,6 +151,5 @@ class UserInformation{
 //     return http.Response('Error', 408); // Request Timeout response status code
 //   },
 // );
-
 
 //

@@ -9,7 +9,7 @@ import 'package:yinsight/Screens/Focus/views/focusCardOnHomePage.dart';
 import 'package:yinsight/Screens/HomePage/widgets/recall_card.dart';
 import 'package:yinsight/Screens/HomePage/widgets/reflection_card.dart';
 
-
+/// The main screen of the application.
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
   static const String id = 'Home_Screen';
@@ -28,7 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     _checkFirstTime();
   }
-
+  /// Checks if this is the user's first time opening the app.
   void _checkFirstTime() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool isFirstTime = (prefs.getBool('isFirstTime') ?? true);
@@ -40,6 +40,7 @@ class _HomeScreenState extends State<HomeScreen> {
       await prefs.setBool('isFirstTime', false);
     }
   }
+  /// Shows a welcome dialog when the user opens the app for the first time.
   void _showWelcomeDialog() {
     showDialog(
       context: context,

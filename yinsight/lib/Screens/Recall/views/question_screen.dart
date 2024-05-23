@@ -6,9 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:yinsight/Globals/services/userInfo.dart';
 
+/// A screen that displays a list of questions retrieved from a server.
 class QuestionsScreen extends StatefulWidget {
   const QuestionsScreen({super.key});
-
   @override
   State<QuestionsScreen> createState() => _QuestionsScreenState();
 }
@@ -23,6 +23,10 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
     fetchQuestions();
   }
 
+  /// Fetches questions from the server.
+  ///
+  /// This method sends an HTTP GET request to the server to retrieve a list of questions.
+  /// The retrieved questions are stored in the [questions] list and the loading state is updated.
   Future<void> fetchQuestions() async {
     var uri = Uri.parse(UserInformation.getRoute('retreiveQuestions')); 
     try {

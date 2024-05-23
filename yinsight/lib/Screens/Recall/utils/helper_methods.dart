@@ -8,7 +8,11 @@ import 'package:animate_do/animate_do.dart';
 import 'package:yinsight/Screens/HomePage/views/home/home_screen.dart';
 import 'package:yinsight/Screens/Recall/services/recall_services.dart';
 
+/// A helper class for various recall-related UI operations.
 class RecallHelpers {
+  /// Displays a popup notification indicating the user can only select one file.
+  ///
+  /// [context]: The build context to show the dialog.
   static void popupNotificationForExceedingGenerating(BuildContext context) {
     showDialog(
       context: context,
@@ -29,6 +33,9 @@ class RecallHelpers {
     );
   }
 
+  /// Displays a popup notification indicating no files have been added.
+  ///
+  /// [context]: The build context to show the dialog.
   static void popupNotificationForEmptyDeletion(context) {
     // Using a SnackBar for the popup notification
     // const snackBar = SnackBar(
@@ -54,6 +61,12 @@ class RecallHelpers {
     );
   }
 
+  /// Displays a confirmation dialog for deleting a file.
+  ///
+  /// [context]: The build context to show the dialog.
+  /// [filePaths]: The path of the file to be deleted.
+  /// [index]: The index of the file to be deleted.
+  /// [deleteFileCallback]: The callback function to delete the file.
   static void DeleteConfirmation(BuildContext context, String filePaths,
     int index, Function(int) deleteFileCallback) {
     String file = filePaths.split('/').last;
@@ -92,6 +105,9 @@ class RecallHelpers {
     );
   }
 
+  /// Returns a widget indicating no files have been added.
+  ///
+  /// Returns a [Center] widget with a text message.
   static Center noFilesAdded() {
     return Center(
       child: Text(
@@ -107,6 +123,9 @@ class RecallHelpers {
     );
   }
 
+  /// Displays a popup notification indicating a file has already been added.
+  ///
+  /// [context]: The build context to show the dialog.
   static void popupNotificationForDuplicates(context) {
     // Using a SnackBar for the popup notification
     // const snackBar = SnackBar(
@@ -133,6 +152,10 @@ class RecallHelpers {
     );
   }
 
+
+  /// Displays a popup notification indicating no files have been added for generation.
+  ///
+  /// [context]: The build context to show the dialog.
   static void popupNotificationForEmptyGeneration(context) {
     // Using a SnackBar for the popup notification
     const snackBar = SnackBar(
@@ -159,6 +182,12 @@ class RecallHelpers {
     );
   }
 
+
+  /// Returns a widget with a fade-up animation for adding a file.
+  ///
+  /// [addFileCallback]: The callback function to add a file.
+  ///
+  /// Returns a [FadeInUp] widget.
   static Widget fadeUpWidget(VoidCallback addFileCallback) {
     return FadeInUp(
       duration: const Duration(milliseconds: 900),
@@ -205,6 +234,10 @@ class RecallHelpers {
     );
   }
 
+
+  /// Navigates back to the home screen.
+  ///
+  /// [context]: The build context to navigate.
   static void backToHomeScreen(context) {
     Navigator.push(
       context,
@@ -214,6 +247,12 @@ class RecallHelpers {
     );
   }
 
+
+  /// Proceeds with the selected files and shows a confirmation dialog.
+  ///
+  /// [selectedFiles]: The set of selected files.
+  /// [context]: The build context to show the dialog.
+  /// [onProceedConfirmed]: The callback function to proceed with the selected files.
   static void proceedWithSelectedFiles(
       Set<String> selectedFiles, 
       BuildContext context, 
@@ -221,6 +260,13 @@ class RecallHelpers {
     _generateQuestionsConfirmation(context, selectedFiles, onProceedConfirmed); // Pass it down
   }
 
+
+
+  /// Displays a confirmation dialog for generating questions.
+  ///
+  /// [context]: The build context to show the dialog.
+  /// [selectedFiles]: The set of selected files.
+  /// [onProceedConfirmed]: The callback function to proceed with the selected files.
   static void _generateQuestionsConfirmation(
       BuildContext context,
       Set<String> selectedFiles,
@@ -265,55 +311,65 @@ class RecallHelpers {
       },
     );
   }
-static Future<void> showGenerationProgressDialog(BuildContext context) async {
-  bool shouldCloseDialog = true;
 
-  // Using StatefulBuilder to handle state within the dialog
-  showDialog<void>(
-    context: context,
-    barrierDismissible: false,
-    builder: (BuildContext context) {
-      return StatefulBuilder(
-        builder: (BuildContext context, StateSetter setState) {
-          // Setup a timer to close the dialog after 2 seconds
-          Future.delayed(const Duration(seconds: 28), () {
-            if (shouldCloseDialog) {
-              Navigator.of(context, rootNavigator: true).pop();
-            }
-          });
+  /// Displays a progress dialog for generating questions.
+  ///
+  /// [context]: The build context to show the dialog.
+  ///
+  /// Returns a [Future] that completes when the dialog is dismissed.
+  static Future<void> showGenerationProgressDialog(BuildContext context) async {
+    bool shouldCloseDialog = true;
 
-          return AlertDialog(
-            title: const Text("Hang Tight!"),
-            content: const Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  "Do not navigate away from this screen till your question has been generated, it is estimated to take 27 seconds. You'll get a notification when it's done.",
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(height: 20),
-                CircularProgressIndicator(),
-              ],
-            ),
-            actions: <Widget>[
-              TextButton(
-                child: const Text("Got it!"),
-                onPressed: () {
-                  shouldCloseDialog = false; // Prevent automatic closure if manually dismissed
-                  Navigator.of(context).pop();
-                },
+    // Using StatefulBuilder to handle state within the dialog
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            // Setup a timer to close the dialog after 2 seconds
+            Future.delayed(const Duration(seconds: 28), () {
+              if (shouldCloseDialog) {
+                Navigator.of(context, rootNavigator: true).pop();
+              }
+            });
+
+            return AlertDialog(
+              title: const Text("Hang Tight!"),
+              content: const Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    "Do not navigate away from this screen till your question has been generated, it is estimated to take 27 seconds. You'll get a notification when it's done.",
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 20),
+                  CircularProgressIndicator(),
+                ],
               ),
-            ],
-          );
-        }
-      );
-    },
-  );
-}
+              actions: <Widget>[
+                TextButton(
+                  child: const Text("Got it!"),
+                  onPressed: () {
+                    shouldCloseDialog = false; // Prevent automatic closure if manually dismissed
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          }
+        );
+      },
+    );
+  }
 
 
 
-
+  /// Generates questions from the selected files.
+  ///
+  /// [selectedFiles]: The set of selected files.
+  /// [onCompleted]: The callback function to call when generation is completed.
+  /// [context]: The build context.
   static void generateQuestions(Set<String> selectedFiles, VoidCallback onCompleted, BuildContext context) {
     RecallServices.generateQuestions(selectedFiles).then((_) {
       // All files uploaded successfully

@@ -10,6 +10,8 @@ import 'package:yinsight/Screens/Login_Signup/widgets/ForgetPassword.dart';
 import 'package:yinsight/Screens/Login_Signup/widgets/SignUpScreen.dart';
 import 'package:yinsight/Screens/Login_Signup/services/user_Authentication.dart';
 
+
+/// A screen that allows users to sign in to their account.
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
   static const String id = 'Signin';
@@ -39,22 +41,18 @@ class _SignInScreenState extends State<SignInScreen> {
     startTimer();
   }
 
-/*
- * This method allows the transitioning between images every second.
- * 
- * @Requires: 
-
-- An integer variable named 'activeIndex' must already be declared and initialized.
-- A function named 'setState' must be defined which takes a function as an argument to update the state of the 'activeIndex'.
-- Timer and Duration classes should be available in the scope of this function. 
-
- @Ensures:
-
-- A periodic timer with a duration of 6 seconds is started.
-- On each tick of the timer, the 'activeIndex' is incremented by 1.
-- If 'activeIndex' equals 3, it is reset back to 0.
-- The 'setState' function is called on each tick of the timer to update the state of 'activeIndex'.
- */
+  /// Starts a timer to transition between images every 6 seconds.
+  ///
+  /// @Requires:
+  /// - An integer variable named 'activeIndex' must already be declared and initialized.
+  /// - A function named 'setState' must be defined which takes a function as an argument to update the state of the 'activeIndex'.
+  /// - Timer and Duration classes should be available in the scope of this function.
+  ///
+  /// @Ensures:
+  /// - A periodic timer with a duration of 6 seconds is started.
+  /// - On each tick of the timer, the 'activeIndex' is incremented by 1.
+  /// - If 'activeIndex' equals 3, it is reset back to 0.
+  /// - The 'setState' function is called on each tick of the timer to update the state of 'activeIndex'.
   void startTimer() {
       _timer = Timer.periodic(const Duration(seconds: 6), (timer) {
         if (mounted) { // Check if the widget is still in the widget tree
@@ -68,46 +66,30 @@ class _SignInScreenState extends State<SignInScreen> {
         }
       });
   }
+
+  /// Navigates to the sign-up screen.
   void _SignUp() {
     Navigator.pushNamed(context, SignUpScreen.id);
   }
 
-
+  /// Navigates to the forgot password screen.
   void _ForgotPassword() {
     Navigator.of(context).pushNamed(ForgetPasswordScreen.id);
   }
 
 
-/* 
- * This method creates a FadeInUp widget using the "animate_do.dart" library with a TextField as its child. The TextField 
- * has a specific style, cursor color,decoration, and prefix icon. The TextField's border changes when it's focused or enabled. 
- * The TextField's label and hint have specific styles. The method returns the FadeInUp widget.
- * 
- * Parameters: 
-  - int delay: The delay before the animation starts, in milliseconds.
-  - int duration: The duration of the animation, in milliseconds.
-  - TextInputType keyboardType: Specifies the type of keyboard to show, such as numeric or text.
-  - String labelText: The text that describes the input field.
-  - String hintText: The text that suggests what sort of input the field accepts.
-  - IconData iconName: The icon to display in the input field.
 
-@Returns: 
-  - FadeInUp: Returns a widget that animates the position of a widget relative to its normal position.
-    The widget will move up and fade in.
-
-@Requires Clause:
-  - The delay and duration parameters must be integers greater than or equal to zero.
-  - The keyboardType parameter must be a valid TextInputType.
-  - The labelText and hintText parameters must be valid strings, not null.
-  - The iconName parameter must be a valid IconData.
-
-@Ensures Clause:
-  - Returns a FadeInUp widget with the specified delay and duration.
-  - The child of the FadeInUp widget is a TextField with the specified keyboardType, labelText, hintText and iconName.
-  - The TextField will have a specific style, cursor color, decoration, and prefix icon as defined in the method.
-  - The TextField's border changes when it's focused or enabled.
-  - The TextField's label and hint have specific styles as defined in the method.
- */
+  /// Creates a FadeInUp widget with a TextField as its child.
+  ///
+  /// [delay]: The delay before the animation starts, in milliseconds.
+  /// [duration]: The duration of the animation, in milliseconds.
+  /// [keyboardType]: Specifies the type of keyboard to show.
+  /// [labelText]: The text that describes the input field.
+  /// [hintText]: The text that suggests what sort of input the field accepts.
+  /// [iconName]: The icon to display in the input field.
+  /// [controller]: The controller for the TextField.
+  ///
+  /// Returns a FadeInUp widget.
   FadeInUp fadeAnimation(int delay, int duration, TextInputType keyboardType,
       String labelText, String hintText, IconData iconName, TextEditingController controller) {
     return FadeInUp(

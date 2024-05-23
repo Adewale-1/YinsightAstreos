@@ -11,7 +11,7 @@ import 'package:yinsight/Screens/HomePage/views/home/home_screen.dart';
 import 'package:yinsight/Screens/Login_Signup/widgets/SignInScreen.dart';
 import 'package:yinsight/Screens/Login_Signup/services/user_Authentication.dart';
 
-
+/// A screen that allows users to sign up for a new account.
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
   static const String id = 'Signup';
@@ -24,7 +24,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   bool _startSecondAnimation = false;
   final _formKey = GlobalKey<FormState>();
 
-    // Define TextEditingControllers
+  // Define TextEditingControllers
   final TextEditingController firstNameController = TextEditingController();
   final TextEditingController lastNameController = TextEditingController();
   final TextEditingController usernameController = TextEditingController();
@@ -41,11 +41,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
     _authServices = AuthServices(context); // Initialize AuthServices instance
   }
 
-
+  /// Navigates to the sign-in screen.
   void _SignIn() {
     Navigator.pushNamed(context, SignInScreen.id);
   }
 
+  /// Navigates to the home screen.
   void _SignUp() { 
     Navigator.push(
       context,
@@ -54,7 +55,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       ),
     );
   }
-  // In your sign-up method, validate the form before proceeding
+  /// Attempts to sign up a new user by validating the form and calling the appropriate service method.
   void _trySignUp() {
     if (_formKey.currentState!.validate()) {
       // Assuming you have text editing controllers for all fields
@@ -82,31 +83,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
   String secondWordInSecondAnimation = 'Recall';
   String thirdWordInSecondAnimation = 'Gamify';
 
-/*
- * Parameters: 
-  - int delay: The delay before the animation starts, in milliseconds.
-  - int duration: The duration of the animation, in milliseconds.
-  - TextInputType keyboardType: Specifies the type of keyboard to show, such as numeric or text.
-  - String labelText: The text that describes the input field.
-  - String hintText: The text that suggests what sort of input the field accepts.
-  - IconData iconName: The icon to display in the input field.
-
-@Returns: 
-  - FadeInUp: Returns a widget that animates the position of a widget relative to its normal position. The widget will move up and fade in.
-
-@Requires Clause:
-  - The delay and duration parameters must be integers greater than or equal to zero.
-  - The keyboardType parameter must be a valid TextInputType.
-  - The labelText and hintText parameters must be valid strings, not null.
-  - The iconName parameter must be a valid IconData.
-
-@Ensures Clause:
-  - Returns a FadeInUp widget with the specified delay and duration.
-  - The child of the FadeInUp widget is a TextField with the specified keyboardType, labelText, hintText and iconName.
-  - The TextField will have a specific style, cursor color, decoration, and prefix icon as defined in the method.
-  - The TextField's border changes when it's focused or enabled.
-  - The TextField's label and hint have specific styles as defined in the method.
- */
+  /// Creates a FadeInUp widget with a TextFormField as its child.
+  ///
+  /// [delay]: The delay before the animation starts, in milliseconds.
+  /// [duration]: The duration of the animation, in milliseconds.
+  /// [keyboardType]: Specifies the type of keyboard to show.
+  /// [labelText]: The text that describes the input field.
+  /// [hintText]: The text that suggests what sort of input the field accepts.
+  /// [iconName]: The icon to display in the input field.
+  /// [controller]: The controller for the TextFormField.
+  /// [validator]: The validator function for the TextFormField.
+  ///
+  /// Returns a FadeInUp widget.
   FadeInUp fadeAnimation(int delay, int duration, TextInputType keyboardType,
       String labelText, String hintText, IconData iconName, TextEditingController controller,String? Function(String?)? validator) {
     return FadeInUp(
@@ -156,6 +144,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final List<String> _countryCodes = ['+1', '+44', '+91','+123'];
   String? _selectedCountryCode = '+1';
 
+
+
+  /// Creates a FadeInUp widget with a dropdown for country codes and a TextFormField for phone numbers.
+  ///
+  /// [delay]: The delay before the animation starts, in milliseconds.
+  /// [duration]: The duration of the animation, in milliseconds.
+  /// [phoneController]: The controller for the TextFormField.
+  /// [validator]: The validator function for the TextFormField.
+  ///
+  /// Returns a FadeInUp widget.
   FadeInUp fadeAnimationWithDropdown(int delay, int duration, TextEditingController phoneController, String? Function(String?)? validator) {
     return FadeInUp(
       delay: Duration(milliseconds: delay),

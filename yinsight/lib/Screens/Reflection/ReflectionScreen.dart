@@ -9,7 +9,7 @@ import 'dart:convert';
 
 import 'package:yinsight/navigationBar.dart';
 
-
+/// The screen for reflecting on questions related to a specific category.
 class ReflectionScreen extends StatefulWidget {
   final String heroTag;
   final Color backgroundColor;
@@ -37,7 +37,7 @@ class _ReflectionScreenState extends State<ReflectionScreen> {
     fetchQuestion();
   }
 
-  
+  /// Fetches a reflection question for the specified category from the server.
   void fetchQuestion() async {
  
     var url = Uri.parse(UserInformation.getRoute('reflect'));
@@ -61,6 +61,7 @@ class _ReflectionScreenState extends State<ReflectionScreen> {
     }
   }
 
+  /// Shows a material banner with a success message and then navigates back to the card screen.
   void showMaterialBanner(BuildContext context, String title, String message) {
     final materialBanner = MaterialBanner(
       elevation: 0,
@@ -91,6 +92,8 @@ class _ReflectionScreenState extends State<ReflectionScreen> {
     );
   }
 
+
+  /// Creates the like button widget with its functionality.
   Visibility likeButtonFuntions() {
     return Visibility(
       visible: isVisible,
@@ -132,6 +135,7 @@ class _ReflectionScreenState extends State<ReflectionScreen> {
     );
   }
 
+  /// Creates a floating action button to navigate back to the card screen.
   Widget buildFloatingActionButton(double iconSize) {
     return SafeArea(
       child: Padding(
@@ -150,6 +154,7 @@ class _ReflectionScreenState extends State<ReflectionScreen> {
     );
   }
 
+  /// Aligns and styles a text widget within the reflection screen.
   Align alignWidgetQuestion(
       double xAxis, double yAxis, int height, String text, FontWeight weight) {
     return Align(
@@ -176,6 +181,8 @@ class _ReflectionScreenState extends State<ReflectionScreen> {
     );
   }
 
+
+  /// Aligns and styles a dynamic text widget for displaying the fetched question.
   Widget alignWidgetDynamicQuestion(
       double xAxis, double yAxis, int height, FontWeight weight) {
     // Check if question is not loaded yet
@@ -218,10 +225,14 @@ class _ReflectionScreenState extends State<ReflectionScreen> {
     }
   }
 
+
+  /// Navigates back to the card screen.
   void _backToCardScreen() {
     Navigator.pushNamedAndRemoveUntil(context, MainNavigationScreen.id, (Route<dynamic> route) => false);
   }
 
+
+  /// Builds a fade-in widget for the reflection text area and save button.
   Widget fadeUpWidget() {
     return FadeInUp(
       duration: const Duration(milliseconds: 900),

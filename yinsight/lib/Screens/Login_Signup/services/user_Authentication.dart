@@ -13,20 +13,27 @@ import 'package:yinsight/navigationBar.dart';
 
 
 
-
+/// A service class for handling authentication-related operations.
 class AuthServices {
   final BuildContext context;
   final storage = const FlutterSecureStorage();
+  /// Creates an [AuthServices] instance.
+  ///
+  /// [context]: The build context.
   AuthServices(this.context);
 
 
-  /* Store Token Securely */
+  /// Stores the authentication token securely.
+  ///
+  /// [token]: The token to store.
   Future<void> storeToken(String? token) async {
     if (token != null) {
       await storage.write(key: 'authToken', value: token);
     }
   }
-  /* Fetch Token Securely */
+  /// Fetches the stored authentication token securely.
+  ///
+  /// Returns the stored token if available.
   Future<String?> fetchToken() async {
     return await storage.read(key: 'authToken');
   }
@@ -68,7 +75,11 @@ class AuthServices {
 
 
 
-  /* Email and Password Sign In */
+
+  /// Signs in using email and password.
+  ///
+  /// [email]: The email address of the user.
+  /// [password]: The password of the user.
   Future<void> signInWithEmailAndPassword(String email, String password) async {
 
     try {
@@ -101,7 +112,12 @@ class AuthServices {
     }
   }
 
-  /* Refresh Token */
+
+  /// Refreshes the authentication token.
+  ///
+  /// [idToken]: The current ID token.
+  ///
+  /// Returns the refreshed token.
   Future<String?> refreshToken(String? idToken) async {
     try {
       // Force refresh the token
@@ -116,7 +132,7 @@ class AuthServices {
     }
   }
 
-
+  /// Signs out the current user.
   Future<void> signOut() async {
     await FirebaseAuth.instance.signOut();
 
@@ -125,7 +141,7 @@ class AuthServices {
   }
 
 
-
+  /// Writes the current authentication token to a file.
   Future<void> writeTokenToFile() async {
     try {
       User? user = FirebaseAuth.instance.currentUser;
@@ -146,6 +162,10 @@ class AuthServices {
   }
 
 
+  /// Sends a password reset link to the specified email address.
+  ///
+  /// [emailController]: The controller containing the email address.
+  /// [context]: The build context.
   Future<void> sendResetLink(TextEditingController emailController, BuildContext context) async {
     String email = emailController.text.trim();
     if (email.isEmpty) {
@@ -184,7 +204,15 @@ class AuthServices {
       );
     }
   }
-
+  /// Creates a new user account.
+  ///
+  /// [firstName]: The first name of the user.
+  /// [lastName]: The last name of the user.
+  /// [username]: The username of the user.
+  /// [email]: The email address of the user.
+  /// [phoneNumber]: The phone number of the user.
+  /// [age]: The age of the user.
+  /// [password]: The password for the account.
   Future<void> createUser({
     required String firstName,
     required String lastName,

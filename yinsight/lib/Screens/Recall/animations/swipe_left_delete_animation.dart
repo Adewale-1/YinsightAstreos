@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+/// A widget that shows a swipe left indicator using an animated arrow.
 class SwipeLeftIndicator extends StatefulWidget {
   const SwipeLeftIndicator({super.key});
 
@@ -30,7 +30,9 @@ class _SwipeLeftIndicatorState extends State<SwipeLeftIndicator>
     _animationController.dispose();
     super.dispose();
   }
-
+  /// Builds the arrow icon.
+  ///
+  /// Returns a [Widget] representing an arrow pointing left.
   Widget _buildArrow() {
     return const Icon(Icons.chevron_left, color: Colors.black);
   }

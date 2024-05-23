@@ -10,6 +10,7 @@ import 'package:yinsight/Globals/services/userInfo.dart';
 import 'package:yinsight/Screens/HomePage/widgets/Calender/calenderSelection.dart';
 import 'package:yinsight/Screens/Login_Signup/services/user_Authentication.dart';
 
+/// A screen that provides various settings options for the user.
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
 
@@ -21,6 +22,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool isDarkMode = false; // Assuming a light mode by default
   UserInformation userInformation = UserInformation();
   final Uri _url = Uri.parse('https://tally.so/r/wg0x1l');
+
+  /// Launches the feedback URL.
   Future<void> _launchUrl() async {
     if (!await launchUrl(_url)) {
       throw Exception('Could not launch $_url');

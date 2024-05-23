@@ -7,7 +7,7 @@ import 'package:yinsight/Globals/services/userInfo.dart';
 import 'package:yinsight/Screens/HomePage/widgets/Calender/eventsCalender.dart';
 
 
-
+/// A screen for displaying the Google Calendar.
 class CalendarDisplayScreen extends StatefulWidget {
   const CalendarDisplayScreen({super.key});
 
@@ -19,42 +19,44 @@ class CalendarDisplayScreen extends StatefulWidget {
 
 class _CalendarDisplayScreenState extends State<CalendarDisplayScreen> {
 
+  /// Picks a file and uploads it to the backend.
+  ///
+  /// [context]: The build context.
+  Future<void> pickAndUploadFile(BuildContext context) async {
+    final user = FirebaseAuth.instance.currentUser;
+    String? token = await user?.getIdToken();
+    if (token == null) throw Exception('No token found');
 
-Future<void> pickAndUploadFile(BuildContext context) async {
-  final user = FirebaseAuth.instance.currentUser;
-  String? token = await user?.getIdToken();
-  if (token == null) throw Exception('No token found');
+    FilePickerResult? result = await FilePicker.platform.pickFiles();
+    if (result != null) {
+      Uri uri = Uri.parse(UserInformation.getRoute('updateISOCalendar'));
+      var request = http.MultipartRequest('POST', uri)
+        ..files.add(await http.MultipartFile.fromPath('file', result.files.single.path!))
+        ..headers.addAll({
+          "Authorization": token,
+        });
 
-  FilePickerResult? result = await FilePicker.platform.pickFiles();
-  if (result != null) {
-    Uri uri = Uri.parse(UserInformation.getRoute('updateISOCalendar'));
-    var request = http.MultipartRequest('POST', uri)
-      ..files.add(await http.MultipartFile.fromPath('file', result.files.single.path!))
-      ..headers.addAll({
-        "Authorization": token,
-      });
-
-    var response = await request.send();
-    if (response.statusCode == 200) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Calendar imported successfully! Processing events...')),
-      );
-      Navigator.of(context).push(
-        MaterialPageRoute(builder: (context) => const GoogleCalendarClass()),
-      );
+      var response = await request.send();
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Calendar imported successfully! Processing events...')),
+        );
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (context) => const GoogleCalendarClass()),
+        );
+      } else {
+        var responseBody = await response.stream.bytesToString();
+        // print('Error response: $responseBody');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to import calendar.')),
+        );
+      }
     } else {
-      var responseBody = await response.stream.bytesToString();
-      // print('Error response: $responseBody');
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to import calendar.')),
+        const SnackBar(content: Text('File selection cancelled')),
       );
     }
-  } else {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('File selection cancelled')),
-    );
   }
-}
 
   @override
   Widget build(BuildContext context) {

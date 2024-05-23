@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 import 'Calender/homeScreenCalender.dart'; 
 import 'TaskNotes/task_section.dart'; 
 
+/// A widget that combines a calendar and task section.
 class CardScheduleWidget extends StatelessWidget {
   final double height;
 
+  /// Creates a [CardScheduleWidget] instance.
+  ///
+  /// [height]: The height of the widget.
   const CardScheduleWidget({super.key, required this.height});
 
   @override

@@ -6,10 +6,13 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 
-
+/// A card widget to display focus-related information on the home page.
 class FocusCard extends StatefulWidget {
   final double height;
 
+  /// Creates a [FocusCard] widget.
+  ///
+  /// [height]: The height of the focus card.
   const FocusCard({super.key, required this.height});
 
   @override
@@ -17,6 +20,10 @@ class FocusCard extends StatefulWidget {
 }
 
 class _FocusCardState extends State<FocusCard> {
+
+  /// Fetches the number of tasks created by the user.
+  ///
+  /// Returns the total number of tasks created as an integer.
   Future<int> fetchNumberOfTasksCreated() async {
     final user = FirebaseAuth.instance.currentUser;
     final token = await user?.getIdToken();

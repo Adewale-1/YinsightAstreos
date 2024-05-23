@@ -7,9 +7,13 @@ import 'package:http/http.dart' as http;
 import 'package:yinsight/Globals/services/userInfo.dart';
 
 
-class RecallServices{
-
-
+/// A service class for handling recall-related operations.
+class RecallServices {
+  /// Generates questions based on the selected file names.
+  ///
+  /// [selectedFileNames]: A set of selected file names.
+  ///
+  /// Throws an [Exception] if no token is found.
     static Future<void> generateQuestions(Set<String> selectedFileNames) async {
       if (selectedFileNames.isEmpty) {
         // print("No files selected.");

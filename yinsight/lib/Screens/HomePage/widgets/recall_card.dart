@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 
+/// A card widget for recall functionality.
 class RecallCard extends StatelessWidget {
   final double height;
   final VoidCallback onTap;
 
+  /// Creates a [RecallCard] instance.
+  ///
+  /// [height]: The height of the card.
+  /// [onTap]: The callback function to be called when the card is tapped.
   const RecallCard({super.key, required this.height, required this.onTap});
 
   @override

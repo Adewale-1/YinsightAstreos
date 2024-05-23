@@ -15,9 +15,9 @@ import 'package:yinsight/Screens/Recall/views/question_screen.dart';
 import 'package:yinsight/Screens/Recall/views/widgets/file_list_view.dart';
 import 'package:http/http.dart' as http;
 
-
+/// A widget that provides the main interface for the Recall feature.
 class Recall extends StatefulWidget {
- const Recall({super.key});
+  const Recall({super.key});
 
   @override
   State<Recall> createState() => _RecallState();
@@ -49,7 +49,9 @@ class _RecallState extends State<Recall> with TickerProviderStateMixin{
 
 
 
-
+  /// Shows a confirmation dialog for deleting all files.
+  ///
+  /// [context]: The build context.
   void _deleteAllConfirmation(BuildContext context) {
     if (filePaths.isEmpty) {
       RecallHelpers.popupNotificationForEmptyDeletion(context);
@@ -78,7 +80,7 @@ class _RecallState extends State<Recall> with TickerProviderStateMixin{
       },
   );
   }
-
+  /// Deletes all files.
   void _deleteAll() {
     setState(() {
       filePaths.clear();
@@ -86,6 +88,11 @@ class _RecallState extends State<Recall> with TickerProviderStateMixin{
     });
   }
 
+  /// Creates a widget for navigating back to the home screen.
+  ///
+  /// [context]: The build context.
+  ///
+  /// Returns a [FloatingActionButton].
   Widget _backToHomeScreenWidget(BuildContext context) {
     return FloatingActionButton(
       onPressed: () => Navigator.of(context).pop(),
@@ -94,7 +101,9 @@ class _RecallState extends State<Recall> with TickerProviderStateMixin{
     );
   }
 
-
+  /// Deletes a file at the specified index.
+  ///
+  /// [index]: The index of the file to delete.
   Future<void> _onDeleteFile(int index) async {
 
     final String fileName = filePaths[index];
@@ -160,20 +169,32 @@ class _RecallState extends State<Recall> with TickerProviderStateMixin{
   //   });
   // }
 
+  /// Handles file selection.
+  ///
+  /// [context]: The build context.
+  /// [index]: The index of the file to select.
+  /// [isSelected]: Whether the file is selected.
   void _handleFileSelection(BuildContext context, int index, bool isSelected) {
-  setState(() {
-    if (isSelected) {
-      if (selectedFiles.isEmpty) {
-        selectedFiles.add(filePaths[index]);
+    setState(() {
+      if (isSelected) {
+        if (selectedFiles.isEmpty) {
+          selectedFiles.add(filePaths[index]);
+        } else {
+          RecallHelpers.popupNotificationForExceedingGenerating(context);
+        }
       } else {
-        RecallHelpers.popupNotificationForExceedingGenerating(context);
+        selectedFiles.remove(filePaths[index]);
       }
-    } else {
-      selectedFiles.remove(filePaths[index]);
-    }
-  });
-}
+    });
+  }
 
+
+  /// Builds the content of the drawer.
+  ///
+  /// [filePaths]: The list of file paths.
+  /// [context]: The build context.
+  ///
+  /// Returns a [Drawer] widget.
   Widget _drawerContent(List<String> filePaths, BuildContext context) {
     return Drawer(
       child: Container(
@@ -234,7 +255,8 @@ class _RecallState extends State<Recall> with TickerProviderStateMixin{
       ),
     );
   }
-  
+
+  /// Adds a file to the list of file paths.
   Future<void> _addFile() async {
     try {
       FilePickerResult? result = await FilePicker.platform.pickFiles(
@@ -259,6 +281,10 @@ class _RecallState extends State<Recall> with TickerProviderStateMixin{
     }
   }
 
+
+  /// Uploads a file to the server.
+  ///
+  /// [filePath]: The path of the file to upload.
   Future<void> _uploadFile(String filePath) async {
     final user = FirebaseAuth.instance.currentUser;
     String? token = await user?.getIdToken();
@@ -285,7 +311,7 @@ class _RecallState extends State<Recall> with TickerProviderStateMixin{
     }
   }
 
-
+  /// Fetches the uploaded files from the server.
   Future<void> _fetchUploadedFiles() async {
     final user = FirebaseAuth.instance.currentUser;
     String? token = await user?.getIdToken();
@@ -310,6 +336,11 @@ class _RecallState extends State<Recall> with TickerProviderStateMixin{
 
 
 
+  /// Checks if a file already exists in the list of file paths.
+  ///
+  /// [filePath]: The path of the file to check.
+  ///
+  /// Returns true if the file already exists, false otherwise.
   bool _fileAlreadyExists(String filePath) {
     if (filePaths.contains(filePath)) {
       RecallHelpers.popupNotificationForDuplicates(context);
@@ -318,6 +349,8 @@ class _RecallState extends State<Recall> with TickerProviderStateMixin{
     return false;
   }
 
+
+  /// Resets the state of the widget.
   void _resetState() {
     setState(() {
       selectedFiles.clear();
@@ -326,6 +359,11 @@ class _RecallState extends State<Recall> with TickerProviderStateMixin{
       notEnableDelete = false;  // Reset other flags as needed
     });
   }
+  /// Builds the app bar.
+  ///
+  /// [context]: The build context.
+  ///
+  /// Returns an [AppBar] widget.
   AppBar _buildAppBar(BuildContext context) {
     return AppBar(
         actions: selectedFiles.isNotEmpty

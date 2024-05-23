@@ -4,7 +4,12 @@ import 'package:yinsight/Screens/Recall/views/recall_screen.dart';
 
 import 'package:yinsight/Screens/Reflection/CardScreen.dart';
 
+/// A service to manage navigation between different screens.
 class NavigationService {
+
+  /// Navigates to the Reflection screen.
+  ///
+  /// [context]: The build context.
   static void navigateToReflection(BuildContext context) {
     Navigator.push(
       context,
@@ -12,6 +17,9 @@ class NavigationService {
     );
   }
 
+  /// Navigates to the Recall screen.
+  ///
+  /// [context]: The build context.
   static void navigateToRecall(BuildContext context) {
     Navigator.push(
       context,
@@ -19,6 +27,9 @@ class NavigationService {
     );
   }
 
+  /// Navigates to the Calendar screen.
+  ///
+  /// [context]: The build context.
   static void navigateToCalendar(BuildContext context) {
     Navigator.push(
       context,

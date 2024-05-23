@@ -6,9 +6,13 @@ import 'package:yinsight/Screens/HomePage/widgets/settings.dart';
 import 'package:yinsight/Screens/Recall/views/recall_screen.dart';
 import 'package:yinsight/Screens/Reflection/CardScreen.dart';
 
+
+/// The main navigation screen of the application.
 class MainNavigationScreen extends StatefulWidget {
+  /// The identifier for the main navigation screen.
   static const String id = 'main_navigation_screen';
 
+  /// Creates a [MainNavigationScreen] widget.
   const MainNavigationScreen({super.key});
 
   @override
@@ -42,9 +46,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           Icon(Icons.sentiment_satisfied_alt, size: 30, color: Colors.white),
           Icon(Icons.settings, size: 30, color: Colors.white),
         ],
-        color: Colors.grey[800]!, // Ensure this is your desired color
-        backgroundColor: Colors.transparent, // Consider making this transparent or a fixed color
-        buttonBackgroundColor: Colors.grey[850], // Ensure this is your desired button background color
+        color: Colors.grey[800]!, // Ensure this is the desired color
+        backgroundColor: Colors.transparent, 
+        buttonBackgroundColor: Colors.grey[850], // Ensure this is the desired button background color
         animationCurve: Curves.easeInOut,
         animationDuration: const Duration(milliseconds: 600),
         onTap: (index) => setState(() => _currentIndex = index),

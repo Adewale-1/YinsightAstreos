@@ -1,23 +1,38 @@
 import 'package:flutter/material.dart';
 
-// Enums for the task priority levels
+/// Enum for the task priority levels.
 enum TaskPriority { low, medium, high }
 
+/// A class representing a task.
 class Task {
   final String id;
   final String name;
   final String notes;
   final TaskPriority priority;
   final DateTime? assignedDate;
-  final DateTime? assignedTime; // Represents the specific datetime the task is scheduled for.
+  final DateTime? assignedTime; 
   final TimeOfDay? startTime;
   final TimeOfDay? endTime;
 
-  final String? expectedTimeToComplete; // Changed the variable name to follow Dart naming convention
+  final String? expectedTimeToComplete; 
   final String? actualTimeToComplete;
   final String? totalTimeSpent;
   final String? recurrence;
 
+  /// Creates a [Task] instance.
+  ///
+  /// [id]: The unique identifier of the task.
+  /// [name]: The name of the task.
+  /// [notes]: Additional notes for the task.
+  /// [priority]: The priority level of the task.
+  /// [assignedDate]: The date the task is assigned.
+  /// [assignedTime]: The specific datetime the task is scheduled for.
+  /// [startTime]: The start time of the task.
+  /// [endTime]: The end time of the task.
+  /// [expectedTimeToComplete]: The expected time to complete the task.
+  /// [actualTimeToComplete]: The actual time taken to complete the task.
+  /// [totalTimeSpent]: The total time spent on the task.
+  /// [recurrence]: The recurrence pattern of the task.
   Task({
     required this.id,
     required this.name,
@@ -74,6 +89,7 @@ class Task {
         recurrence: recurrence ?? this.recurrence,
       );
     }
+  /// Converts the task instance to a JSON object.
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -92,7 +108,11 @@ class Task {
     };
   }
 
-  // Implementing a method to create a Task object from a JSON-like map
+  /// Creates a [Task] instance from a JSON object.
+  ///
+  /// [json]: The JSON object to parse.
+  ///
+  /// Returns the parsed [Task] instance.
   factory Task.fromJson(Map<String, dynamic> json) {
     return Task(
       id: json['id'] as String,

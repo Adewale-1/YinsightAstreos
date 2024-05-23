@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+/// A card widget for reflection functionality.
 class ReflectionCard extends StatelessWidget {
   final double cardHeight;
   final double cardWidth;
   final VoidCallback onTap;
 
+  /// Creates a [ReflectionCard] instance.
+  ///
+  /// [cardHeight]: The height of the card.
+  /// [cardWidth]: The width of the card.
+  /// [onTap]: The callback function to be called when the card is tapped.
   const ReflectionCard({
     super.key,
     required this.cardHeight,
@@ -73,7 +79,12 @@ class ReflectionCard extends StatelessWidget {
       );
 
   }
-
+  /// Builds a small card widget used inside the reflection card.
+  ///
+  /// [height]: The height of the small card.
+  /// [width]: The width of the small card.
+  ///
+  /// Returns the small card widget.
   Widget _buildSmallCard(double height, double width) {
     return Container(
       height: height,

@@ -9,7 +9,7 @@ import 'package:yinsight/Screens/Login_Signup/services/user_Authentication.dart'
 
 
 
-
+/// A screen that allows users to reset their password.
 class ForgetPasswordScreen extends StatefulWidget {
   const ForgetPasswordScreen({super.key});
   static const String id = 'ForgetPassword';
@@ -34,7 +34,7 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
     _emailController.dispose();
     super.dispose();
   }
-
+  /// Navigates to the sign-up screen.
   void _SignUp() {
     Navigator.pushNamed(context, SignUpScreen.id);
   }

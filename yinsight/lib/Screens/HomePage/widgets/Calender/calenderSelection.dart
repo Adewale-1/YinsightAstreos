@@ -3,7 +3,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:yinsight/Screens/HomePage/widgets/Calender/googleCalender.dart';
 
-
+/// A screen for selecting calendar sync options.
 class CalendarSelectionScreen extends StatelessWidget {
   const CalendarSelectionScreen({super.key});
 
@@ -85,6 +85,14 @@ class CalendarSelectionScreen extends StatelessWidget {
     );
   }
 
+  /// Builds a calendar option widget.
+  ///
+  /// [context]: The build context.
+  /// [title]: The title of the calendar option.
+  /// [icon]: The icon representing the calendar option.
+  /// [onTap]: The callback function to be called when the option is tapped.
+  ///
+  /// Returns the calendar option widget.
   ListTile _buildCalendarOption(BuildContext context, String title, IconData icon, VoidCallback onTap) {
     return ListTile(
       leading: Icon(icon),

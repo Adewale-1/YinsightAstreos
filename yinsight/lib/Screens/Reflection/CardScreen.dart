@@ -9,6 +9,8 @@ import 'package:yinsight/Screens/Reflection/ReflectionScreen.dart';
 import 'package:yinsight/Screens/Reflection/SwipeUpAnimation.dart';
 import 'package:yinsight/navigationBar.dart';
 
+
+/// The main screen for displaying and navigating through different reflection categories.
 class CardScreen extends StatefulWidget {
   const CardScreen({super.key});
   static const String id = 'CardScreen';
@@ -27,7 +29,7 @@ class _CardScreenState extends State<CardScreen> with TickerProviderStateMixin {
   // int currentPage = 0;
 
 
-
+  /// List of categories with their corresponding names, images, and colors.
   final List<Map<String, dynamic>> categories = [
     {
       'name': 'Self-Care',
@@ -67,7 +69,7 @@ class _CardScreenState extends State<CardScreen> with TickerProviderStateMixin {
 
     // ... (add the rest of the entries with names, pictures, and colors)
   ];
-
+  /// Navigates back to the home screen.
   void _backToHomeScreen() {
     Navigator.pushNamedAndRemoveUntil(context, MainNavigationScreen.id, (Route<dynamic> route) => false);
   }
@@ -112,7 +114,7 @@ class _CardScreenState extends State<CardScreen> with TickerProviderStateMixin {
     }
     super.dispose();
   }
-
+  /// Checks and shows a welcome dialog if it's the first time the user visits this screen.
   Future<void> _checkAndShowWelcomeDialog() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool isFourthShown = prefs.getBool('isFourthShown') ?? false;
@@ -125,6 +127,7 @@ class _CardScreenState extends State<CardScreen> with TickerProviderStateMixin {
     }
   }
 
+  /// Displays a welcome dialog with instructions for the user.
   void _showWelcomeDialog() {
     showDialog(
       context: context,
@@ -147,9 +150,11 @@ class _CardScreenState extends State<CardScreen> with TickerProviderStateMixin {
     );
   }
   
-/// Update the Private method _navigateToReflectionScreen to also 
-/// get which Card was selected so route the approipraite question 
-/// to the ReflectionScreen
+  /// Navigates to the reflection screen for the selected category.
+  ///
+  /// [heroTag]: The tag for the hero animation.
+  /// [color]: The background color for the reflection screen.
+  /// [categoryName]: The name of the selected category.
   void _navigateToReflectionScreen(String heroTag, Color color, String categoryName) {
     Navigator.of(context).push(PageRouteBuilder(
       transitionDuration: const Duration(milliseconds: 600),
@@ -167,6 +172,12 @@ class _CardScreenState extends State<CardScreen> with TickerProviderStateMixin {
     ));
   }
 
+
+  /// Handles the vertical drag update to navigate to the reflection screen.
+  ///
+  /// [details]: The drag update details.
+  /// [index]: The index of the selected card.
+  /// [color]: The background color for the reflection screen.
   void onVerticalDragUpdate(DragUpdateDetails details, int index, Color color) {
     if (details.primaryDelta != null && details.primaryDelta! < -7) {
       // More sensitive drag detection
@@ -176,6 +187,13 @@ class _CardScreenState extends State<CardScreen> with TickerProviderStateMixin {
     }
   }
 
+
+  /// Builds a card widget for the specified index.
+  ///
+  /// [context]: The build context.
+  /// [index]: The index of the card to build.
+  ///
+  /// Returns a [Widget] representing the card.
   Widget _buildCard(BuildContext context, int index) {
     final category = categories[index];
     final String heroTag = 'cardHeroTag$index';
@@ -386,6 +404,7 @@ class _CardScreenState extends State<CardScreen> with TickerProviderStateMixin {
     );
   }
 
+  /// Builds the navigation buttons for the page view.
   Widget _buildPageNavigationButtons(BuildContext context) {
     return Container(
       // margin: const EdgeInsets.symmetric(vertical: 20.0),

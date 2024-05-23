@@ -3,12 +3,18 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 
 
-
+/// A service class for handling welcome dialogs.
 class WelcomeService {
   final GlobalKey<ScaffoldState> scaffoldKey;
 
+  /// Creates a [WelcomeService] instance.
+  ///
+  /// [scaffoldKey]: The global key for the scaffold.
   WelcomeService(this.scaffoldKey);
 
+  /// Checks if the welcome dialog has been shown and shows it if not.
+  ///
+  /// This method uses shared preferences to track if the dialog has been shown.
   Future<void> checkAndShowWelcomeDialog() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool isThirdShown = prefs.getBool('isThirdShown') ?? false;
@@ -21,6 +27,9 @@ class WelcomeService {
     }
   }
 
+  /// Displays the welcome dialog.
+  ///
+  /// [context]: The build context to show the dialog.
   void _showWelcomeDialog(BuildContext context) {
     showDialog(
       context: context,

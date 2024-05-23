@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// A widget that displays a swipe up indicator animation.
 class SwipeUpIndicator extends StatefulWidget {
   const SwipeUpIndicator({super.key});
 
@@ -30,6 +31,7 @@ class _SwipeUpIndicatorState extends State<SwipeUpIndicator>
     super.dispose();
   }
 
+  /// Builds an arrow icon with the specified color.
   Widget _buildArrow(Color color) {
     return Icon(
       Icons.expand_less,
@@ -55,8 +57,7 @@ class _SwipeUpIndicatorState extends State<SwipeUpIndicator>
             const SizedBox(height: 2.0),
             Opacity(
                 opacity: _opacityAnimation.value,
-                child: _buildArrow(Colors.black)
-            ),
+                child: _buildArrow(Colors.black)),
           ],
         );
       },
