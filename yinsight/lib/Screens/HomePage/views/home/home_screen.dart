@@ -3,16 +3,24 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:yinsight/Screens/HomePage/services/navigation_service.dart';
+import 'package:yinsight/Screens/HomePage/widgets/assignment_info_card.dart';
 import 'package:yinsight/Screens/HomePage/widgets/avatar.dart';
 import 'package:yinsight/Screens/HomePage/widgets/card_schedule_widget.dart';
 import 'package:yinsight/Screens/Focus/views/focusCardOnHomePage.dart';
+import 'package:yinsight/Screens/HomePage/widgets/progress_info_card.dart';
 import 'package:yinsight/Screens/HomePage/widgets/recall_card.dart';
 import 'package:yinsight/Screens/HomePage/widgets/reflection_card.dart';
 
 /// The main screen of the application.
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({
+    super.key,
+    required this.onSectionTap,
+    });
   static const String id = 'Home_Screen';
+
+  // go to either the Focus, Recall, or Reflect page, and update the bottom navigation bar
+  final void Function(int index) onSectionTap;
 
 
   @override
@@ -137,9 +145,88 @@ class _HomeScreenState extends State<HomeScreen> {
                    children: [
                     const CardScheduleWidget(height: 400),
                     const SizedBox(height: 20),
+
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: Colors.black),
+                            ),
+                            child: Column(
+                              children: [
+                                AssignmentInfoCard(
+                                  title: 'Recall',
+                                  content: 'Placeholder text for recall.',
+                                  color: Colors.red,
+                                  onTap: () => widget.onSectionTap(2),
+                                ),
+                                const SizedBox(height: 10),
+                                AssignmentInfoCard(
+                                  title: 'Focus',
+                                  content: 'Placeholder text for focus.',
+                                  color: Colors.green,
+                                  onTap: () => widget.onSectionTap(1),
+                                ),
+                                const SizedBox(height: 10),
+                                AssignmentInfoCard(
+                                  title: 'Reflect',
+                                  content: 'Placeholder text for reflect.',
+                                  color: Colors.blue,
+                                  onTap: () => widget.onSectionTap(3),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(width: 10),
+
+                        Expanded(
+                          child: Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: Colors.black),
+                            ),
+                            child: Column(
+                              children: [
+                                ProgressInfoCard(
+                                  title: 'Recall',
+                                  progress: 0.7,
+                                  color: Colors.red,
+                                  onTap: () => widget.onSectionTap(2),
+                                ),
+                                const SizedBox(height: 10),
+                                ProgressInfoCard(
+                                  title: 'Focus',
+                                  progress: 0.5,
+                                  color: Colors.green,
+                                  onTap: () => widget.onSectionTap(1),
+                                ),
+                                const SizedBox(height: 10),
+                                ProgressInfoCard(
+                                  title: 'Reflect',
+                                  progress: 0.9,
+                                  color: Colors.blue,
+                                  onTap: () => widget.onSectionTap(3),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 10,),
+
                     const FocusCard(
                       height: 150),
+
                     const SizedBox(height: 20),// 2% of the screen height for spacing
+
                       Row(
                         children: [
                           Expanded(
@@ -161,6 +248,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 ),
               ),
+
+              const SizedBox(height: 10,),
             ],
           ),
         ),

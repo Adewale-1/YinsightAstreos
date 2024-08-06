@@ -47,11 +47,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   /// Navigates to the home screen.
-  void _SignUp() { 
+  void _SignUp(void Function(int index) onSectionTap) { 
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const HomeScreen(),
+        builder: (context) => HomeScreen(onSectionTap: onSectionTap),
       ),
     );
   }

@@ -72,11 +72,22 @@ class MyApp extends StatelessWidget {
       
       // Direct to MainNavigationScreen if a user is logged in
       initialRoute: FirebaseAuth.instance.currentUser != null ? MainNavigationScreen.id : OnboardingController.id,
+      onGenerateRoute: (settings) {
+        if (settings.name == HomeScreen.id) {
+          final args = settings.arguments as Function(int);
+          return MaterialPageRoute(
+            builder: (context) {
+              return HomeScreen(onSectionTap: args);
+            },
+          );
+        }
+        return null;
+      },
       routes: {
         MainNavigationScreen.id: (context) => const MainNavigationScreen(),
         SignInScreen.id: (context) => const SignInScreen(),
         SignUpScreen.id: (context) => const SignUpScreen(),
-        HomeScreen.id: (context) => const HomeScreen(),
+        // HomeScreen.id: (context) => const HomeScreen(),
         ForgetPasswordScreen.id: (context) => const ForgetPasswordScreen(),
         OnboardingController.id: (context) => const OnboardingController(),
       },
@@ -84,5 +95,3 @@ class MyApp extends StatelessWidget {
   }
 
 }
-
-

@@ -23,13 +23,27 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   int _currentIndex = 0;
   final GlobalKey<CurvedNavigationBarState> _bottomNavigationKey = GlobalKey();
 
+  // late final List<Widget> _screens = [
+  //   const HomeScreen(),
+  //   const focusSection(),
+  //   const Recall(), // Ensure this is the correct class name
+  //   const CardScreen(),
+  //   const SettingsScreen(),
+  // ];
+
   late final List<Widget> _screens = [
-    const HomeScreen(),
+    HomeScreen(onSectionTap: _navigateToSection), // Pass the callback
     const focusSection(),
-    const Recall(), // Ensure this is the correct class name
+    const Recall(),
     const CardScreen(),
     const SettingsScreen(),
   ];
+
+  void _navigateToSection(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

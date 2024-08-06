@@ -238,11 +238,11 @@ class RecallHelpers {
   /// Navigates back to the home screen.
   ///
   /// [context]: The build context to navigate.
-  static void backToHomeScreen(context) {
+  static void backToHomeScreen(void Function(int index) onSectionTap, context) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const HomeScreen(),
+        builder: (context) => HomeScreen(onSectionTap: onSectionTap),
       ),
     );
   }

@@ -59,6 +59,8 @@ class ReflectionCard extends StatelessWidget {
                     children: List.generate(3, (index) => _buildSmallCard(screenHeight * 0.08, screenWidth *0.06)), // Using small cards
                   ),
                 ),
+
+                const SizedBox(height: 30)
               ],
             ),
             Positioned(
