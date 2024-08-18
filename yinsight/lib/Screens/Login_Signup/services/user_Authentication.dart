@@ -3,25 +3,25 @@ import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:yinsight/Globals/services/userInfo.dart';
+import 'package:yinsight/Screens/HomePage/widgets/Calender/eventsCalender.dart';
 import 'package:yinsight/Screens/Login_Signup/widgets/SignInScreen.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-import 'package:yinsight/navigationBar.dart'; 
-
-
+import 'package:yinsight/navigationBar.dart';
 
 /// A service class for handling authentication-related operations.
 class AuthServices {
   final BuildContext context;
   final storage = const FlutterSecureStorage();
+
   /// Creates an [AuthServices] instance.
   ///
   /// [context]: The build context.
   AuthServices(this.context);
-
 
   /// Stores the authentication token securely.
   ///
@@ -31,6 +31,7 @@ class AuthServices {
       await storage.write(key: 'authToken', value: token);
     }
   }
+
   /// Fetches the stored authentication token securely.
   ///
   /// Returns the stored token if available.
@@ -38,11 +39,10 @@ class AuthServices {
     return await storage.read(key: 'authToken');
   }
 
-
   // /* Google Sign In */
   // Future<void> signInWithGoogle() async {
   //   try {
-      
+
   //     final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
 
   //     if (googleUser == null) return;
@@ -64,24 +64,20 @@ class AuthServices {
 
   //   } on FirebaseAuthException catch (e) {
   //     // Handle Firebase authentication errors
-  //     print('FirebaseAuthException: ${e.message}');
+  //     // print('FirebaseAuthException: ${e.message}');
   //     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Authentication error: ${e.message}')));
   //   } catch (error) {
   //     // Handle other errors
-  //     print('General Error: $error');
+  //     // print('General Error: $error');
   //     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('An error occurred during Google Sign-In. Please try again.')));
   //   }
   // }
-
-
-
 
   /// Signs in using email and password.
   ///
   /// [email]: The email address of the user.
   /// [password]: The password of the user.
   Future<void> signInWithEmailAndPassword(String email, String password) async {
-
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: email.trim(),
@@ -93,14 +89,11 @@ class AuthServices {
         String? token = await user.getIdToken();
         // print('User Token: ${token}');
 
-
-
-        String? freshIdToken = await refreshToken(token); 
+        String? freshIdToken = await refreshTokenWithToken(token);
         // Use freshIdToken as needed or proceed without it if not explicitly needed
-       Navigator.pushNamedAndRemoveUntil(context, MainNavigationScreen.id, (Route<dynamic> route) => false);
+        Navigator.pushNamedAndRemoveUntil(
+            context, MainNavigationScreen.id, (Route<dynamic> route) => false);
       }
-
-
     } on FirebaseAuthException catch (e) {
       // Display snackbar to inform user about sign-in failure
       ScaffoldMessenger.of(context).showSnackBar(
@@ -112,13 +105,12 @@ class AuthServices {
     }
   }
 
-
   /// Refreshes the authentication token.
   ///
   /// [idToken]: The current ID token.
   ///
   /// Returns the refreshed token.
-  Future<String?> refreshToken(String? idToken) async {
+  Future<String?> refreshTokenWithToken(String? idToken) async {
     try {
       // Force refresh the token
       // String? idToken = await FirebaseAuth.instance.currentUser?.getIdToken(true);
@@ -137,9 +129,8 @@ class AuthServices {
     await FirebaseAuth.instance.signOut();
 
     // Navigate to SignInScreen upon successful sign-out
-    Navigator.of(context).pushReplacementNamed(SignInScreen.id); 
+    Navigator.of(context).pushReplacementNamed(SignInScreen.id);
   }
-
 
   /// Writes the current authentication token to a file.
   Future<void> writeTokenToFile() async {
@@ -161,12 +152,12 @@ class AuthServices {
     }
   }
 
-
   /// Sends a password reset link to the specified email address.
   ///
   /// [emailController]: The controller containing the email address.
   /// [context]: The build context.
-  Future<void> sendResetLink(TextEditingController emailController, BuildContext context) async {
+  Future<void> sendResetLink(
+      TextEditingController emailController, BuildContext context) async {
     String email = emailController.text.trim();
     if (email.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -179,7 +170,9 @@ class AuthServices {
       await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
       // If successful, show a confirmation message
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('A link to reset your password has been sent to $email.')),
+        SnackBar(
+            content:
+                Text('A link to reset your password has been sent to $email.')),
       );
       // Wait for a few seconds and then navigate to SignIn page
       Future.delayed(const Duration(seconds: 5), () {
@@ -200,10 +193,55 @@ class AuthServices {
     } catch (e) {
       // Handle any other errors that might occur
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('An unexpected error occurred. Please try again later.')),
+        const SnackBar(
+            content:
+                Text('An unexpected error occurred. Please try again later.')),
       );
     }
   }
+
+  Future<void> signInWithGoogle() async {
+    try {
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+
+      if (googleUser == null) return;
+
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+
+      final OAuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+      
+      await FirebaseAuth.instance.signInWithCredential(credential);
+
+      // Refresh the token right after sign-in, if needed for immediate use
+      String? freshIdToken = await refreshToken();
+      // print("freshIdToken: ${freshIdToken}");
+      final user = FirebaseAuth.instance.currentUser;
+      // Use freshIdToken as needed, for example, sending it to your backend
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const GoogleCalendarClass()),
+      );
+    } on FirebaseAuthException catch (e) {
+      // Handle Firebase authentication errors
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Authentication error: ${e.message}')));
+    } catch (error) {
+      // Handle other errors
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text(
+              'An error occurred during Google Sign-In. Please try again.')));
+    }
+  }
+
+  Future<String?> refreshToken() async {
+    // Implement your token refresh logic here
+    return FirebaseAuth.instance.currentUser?.getIdToken(true);
+  }
+
   /// Creates a new user account.
   ///
   /// [firstName]: The first name of the user.
@@ -222,8 +260,7 @@ class AuthServices {
     required int age,
     required String password,
   }) async {
-
-    var url = Uri.parse(UserInformation.getRoute('signup')); 
+    var url = Uri.parse(UserInformation.getRoute('signup'));
 
     try {
       var response = await http.post(
@@ -238,21 +275,21 @@ class AuthServices {
           'email': email,
           'phone_number': phoneNumber,
           'age': age,
-          'password': password, 
+          'password': password,
         }),
       );
       // print("first_name: $firstName and lastnmae: $lastName and username: $username and email: $email and phone_number: $phoneNumber and password: $password");
       if (response.statusCode == 200) {
         // Successfully created an account
         var data = jsonDecode(response.body);
-        // print(data['message']); 
-        
+        // print(data['message']);
+
         // Force sign-in is required to synchronize the user's authentication state across backend and frontend, ensuring the newly created user is recognized by the frontend.
         signInWithEmailAndPassword(email, password);
       } else {
         // Handle errors
         var data = jsonDecode(response.body);
-        // print(data['message']); 
+        // print(data['message']);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(data['message'])),
         );
@@ -261,12 +298,10 @@ class AuthServices {
       // Handle any errors that occur during the HTTP request
       // print(e.toString());
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('An unexpected error occurred. Please try again later.')),
+        const SnackBar(
+            content:
+                Text('An unexpected error occurred. Please try again later.')),
       );
     }
   }
-
-
-
-
 }

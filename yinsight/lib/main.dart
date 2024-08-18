@@ -14,7 +14,6 @@ import 'firebase_options.dart';
 
 /// The main entry point of the application.
 void main() async {
-
   WidgetsFlutterBinding.ensureInitialized();
   // Initialize Awesome Notifications
   await AwesomeNotifications().initialize(
@@ -37,7 +36,8 @@ void main() async {
     ],
   );
   // Check notification permission
-  bool isAllowedToSendNotifictions = await AwesomeNotifications().isNotificationAllowed();
+  bool isAllowedToSendNotifictions =
+      await AwesomeNotifications().isNotificationAllowed();
   if (!isAllowedToSendNotifictions) {
     await AwesomeNotifications().requestPermissionToSendNotifications();
   }
@@ -53,8 +53,6 @@ void main() async {
   FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
 }
 
-
-
 /// The main application widget.
 class MyApp extends StatelessWidget {
   /// Creates a [MyApp] widget.
@@ -69,9 +67,11 @@ class MyApp extends StatelessWidget {
           bodyLarge: TextStyle(color: Colors.black54),
         ),
       ),
-      
+
       // Direct to MainNavigationScreen if a user is logged in
-      initialRoute: FirebaseAuth.instance.currentUser != null ? MainNavigationScreen.id : OnboardingController.id,
+      initialRoute: FirebaseAuth.instance.currentUser != null
+          ? MainNavigationScreen.id
+          : OnboardingController.id,
       routes: {
         MainNavigationScreen.id: (context) => const MainNavigationScreen(),
         SignInScreen.id: (context) => const SignInScreen(),
@@ -82,7 +82,4 @@ class MyApp extends StatelessWidget {
       },
     );
   }
-
 }
-
-
