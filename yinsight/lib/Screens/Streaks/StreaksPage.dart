@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:yinsight/Screens/HomePage/services/navigation_service.dart'; // Import to format the month name
+import 'package:yinsight/Screens/HomePage/services/navigation_service.dart';
 
 class StreaksPage extends StatefulWidget {
   @override
@@ -9,11 +9,40 @@ class StreaksPage extends StatefulWidget {
 }
 
 class _StreaksPageState extends State<StreaksPage> {
-  List<bool> completedDays =
-      List.generate(31, (index) => false); // Example data
+  // Example data - replace this with your backend data
+  Map<DateTime, int> heatmapData = {
+    DateTime(2024, 2, 1): 5,
+    DateTime(2024, 2, 2): 2,
+    DateTime(2024, 2, 3): 8,
+    DateTime(2024, 2, 5): 10,
+    DateTime(2024, 8, 1): 5,
+    DateTime(2024, 8, 2): 2,
+    DateTime(2024, 8, 3): 8,
+    DateTime(2024, 8, 5): 10,
+    DateTime(2024, 8, 18): 10,
+    DateTime(2024, 8, 7): 5,
+    DateTime(2024, 8, 8): 2,
+    DateTime(2024, 8, 11): 8,
+    DateTime(2024, 8, 12): 10,
+    // Add more data points as needed
+  };
 
-  double focusProgress = 0.7; // Example progress value
-  double recallProgress = 0.5; // Example progress value
+  // Controller for the PageView
+  PageController _pageController;
+  int _currentPageIndex;
+
+  _StreaksPageState()
+      : _currentPageIndex =
+            DateTime.now().month - 1, // Start with the current month
+        _pageController = PageController(initialPage: DateTime.now().month - 1);
+
+  Color getHeatmapColor(int value) {
+    if (value == 0) return Colors.grey.withOpacity(0.5); // No data
+    if (value <= 2) return Colors.green[100]!;
+    if (value <= 5) return Colors.green[300]!;
+    if (value <= 8) return Colors.green[500]!;
+    return Colors.green[700]!;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +53,7 @@ class _StreaksPageState extends State<StreaksPage> {
           padding: const EdgeInsets.fromLTRB(10, 10, 10, 5),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [ 
+            children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
@@ -63,8 +92,7 @@ class _StreaksPageState extends State<StreaksPage> {
               ),
               const SizedBox(height: 20),
               Container(
-                // Change this from Expanded to Container
-                height: 400, // Set the height to 350
+                height: 400,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(15),
                   color: Colors.white,
@@ -79,20 +107,29 @@ class _StreaksPageState extends State<StreaksPage> {
                   ],
                 ),
                 child: PageView.builder(
-                  itemCount: 12, // Number of months to show
+                  controller: _pageController,
+                  itemCount:
+                      DateTime.now().month, // Only up to the current month
+                  onPageChanged: (index) {
+                    setState(() {
+                      _currentPageIndex = index;
+                    });
+                  },
                   itemBuilder: (context, monthIndex) {
                     int year = DateTime.now().year;
+                    DateTime firstDayOfMonth =
+                        DateTime(year, monthIndex + 1, 1);
                     int daysInMonth = DateTime(year, monthIndex + 2, 0).day;
 
-                    String monthName = DateFormat.MMMM()
-                        .format(DateTime(year, monthIndex + 1));
+                    String monthName =
+                        DateFormat.MMMM().format(firstDayOfMonth);
 
                     return Column(
                       children: [
                         Padding(
                           padding: const EdgeInsets.fromLTRB(0, 8, 0, 5),
                           child: Text(
-                            monthName, // Display the month name
+                            monthName,
                             style: const TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
@@ -100,27 +137,46 @@ class _StreaksPageState extends State<StreaksPage> {
                             ),
                           ),
                         ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: ['S', 'M', 'T', 'W', 'T', 'F', 'S']
+                              .map((day) => Text(day,
+                                  style: const TextStyle(color: Colors.black)))
+                              .toList(),
+                        ),
                         Expanded(
                           child: Padding(
                             padding: const EdgeInsets.all(16.0),
                             child: GridView.builder(
                               gridDelegate:
                                   const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 7, // 7 days in a week
+                                crossAxisCount: 7,
                                 mainAxisSpacing: 8,
                                 crossAxisSpacing: 8,
                               ),
-                              itemCount:
-                                  daysInMonth, // Correct number of days in the month
-                              itemBuilder: (context, dayIndex) {
-                                bool isCompleted =
-                                    completedDays[dayIndex]; // Example data
+                              itemCount: 42, // 6 weeks * 7 days
+                              itemBuilder: (context, index) {
+                                int dayNumber =
+                                    index - firstDayOfMonth.weekday + 1;
+                                if (dayNumber < 1 || dayNumber > daysInMonth) {
+                                  return Container(); // Empty container for days outside the month
+                                }
+                                DateTime currentDate =
+                                    DateTime(year, monthIndex + 1, dayNumber);
+                                int value = heatmapData[currentDate] ?? 0;
                                 return Container(
                                   decoration: BoxDecoration(
-                                    color: isCompleted
-                                        ? Colors.deepPurpleAccent
-                                        : Colors.black.withOpacity(0.3),
+                                    color: getHeatmapColor(value),
                                     borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Center(
+                                    // child: Text(
+                                    //   dayNumber.toString(),
+                                    //   style: const TextStyle(
+                                    //     color: Colors.black54,
+                                    //     fontWeight: FontWeight.bold,
+                                    //   ),
+                                    // ),
                                   ),
                                 );
                               },
@@ -132,96 +188,6 @@ class _StreaksPageState extends State<StreaksPage> {
                   },
                 ),
               ),
-              // const SizedBox(
-              //   height: 10, // Reduced height to make it more compact
-              // ),
-
-              // // "Today" Section
-              // const Padding(
-              //   padding: EdgeInsets.symmetric(horizontal: 16.0),
-              //   child: Align(
-              //     alignment: Alignment.centerLeft,
-              //     child: Text(
-              //       "Today",
-              //       style: TextStyle(
-              //         fontSize:
-              //             20, // Slightly reduce font size to better match a compact design
-              //         fontWeight: FontWeight.bold,
-              //         color: Colors.black,
-              //       ),
-              //     ),
-              //   ),
-              // ),
-              // const SizedBox(
-              //   height: 10, // Reduced height to make it more compact
-              // ),
-
-              // // Focus Section
-              // Padding(
-              //   padding:
-              //       const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-              //   child: Column(
-              //     crossAxisAlignment: CrossAxisAlignment.start,
-              //     children: [
-              //       const Text(
-              //         "Focus",
-              //         style: TextStyle(
-              //           fontSize: 18, // Slightly reduce font size
-              //           fontWeight: FontWeight
-              //               .w500, // Adjust weight for visual consistency
-              //           color: Colors.black,
-              //         ),
-              //       ),
-              //       const SizedBox(
-              //         height:
-              //             8, // Add a little space between text and progress bar
-              //       ),
-              //       LinearProgressIndicator(
-              //         value: focusProgress,
-              //         minHeight:
-              //             5, // Thinner progress bar to match compact design
-              //         backgroundColor: Colors.grey[
-              //             300], // Adjust background color for better contrast
-              //         valueColor: const AlwaysStoppedAnimation<Color>(
-              //             Colors.blue), // Custom progress color
-              //       ),
-              //     ],
-              //   ),
-              // ),
-              // const SizedBox(
-              //   height: 10, // Reduced height to keep spacing consistent
-              // ),
-
-              // // Recall Section
-              // Padding(
-              //   padding:
-              //       const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-              //   child: Column(
-              //     crossAxisAlignment: CrossAxisAlignment.start,
-              //     children: [
-              //       const Text(
-              //         "Recall",
-              //         style: TextStyle(
-              //           fontSize: 18, // Match the Focus section for consistency
-              //           fontWeight: FontWeight.w500, // Adjust weight
-              //           color: Colors.black,
-              //         ),
-              //       ),
-              //       const SizedBox(
-              //         height:
-              //             8, // Add a little space between text and progress bar
-              //       ),
-              //       LinearProgressIndicator(
-              //         value: recallProgress,
-              //         minHeight: 5, // Thinner progress bar
-              //         backgroundColor:
-              //             Colors.grey[300], // Adjust background color
-              //         valueColor: const AlwaysStoppedAnimation<Color>(
-              //             Colors.green), // Custom progress color
-              //       ),
-              //     ],
-              //   ),
-              // ),
             ],
           ),
         ),

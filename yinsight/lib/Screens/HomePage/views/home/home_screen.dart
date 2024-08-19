@@ -1,7 +1,11 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:yinsight/Globals/services/userInfo.dart';
 import 'package:yinsight/Screens/HomePage/services/navigation_service.dart';
 import 'package:yinsight/Screens/HomePage/widgets/avatar.dart';
 import 'package:yinsight/Screens/HomePage/widgets/card_schedule_widget.dart';
@@ -24,12 +28,15 @@ class _HomeScreenState extends State<HomeScreen>
   late AnimationController _animationController;
   late Animation<double> _animation;
 
+  get http => null;
+  String activity = "userOpenedApp";
   @override
   void initState() {
     super.initState();
     _checkFirstTime();
     _setupAnimation();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _showTransitionGif());
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => _checkAndUpdatePoints());
   }
 
   void _setupAnimation() {
@@ -39,6 +46,68 @@ class _HomeScreenState extends State<HomeScreen>
     );
     _animation =
         Tween<double>(begin: 0.0, end: 1.0).animate(_animationController);
+  }
+
+  Future<void> _checkAndUpdatePoints() async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      String? token = await user?.getIdToken();
+      if (token == null) {
+        print("No token found");
+        return;
+      }
+
+      final url =
+          '${UserInformation.getRoute('checkForPoints')}?activity=$activity';
+      // print('Attempting to call URL: $url');
+      // print('Token: $token'); // Print token for debugging
+
+      final httpClient = HttpClient();
+      try {
+        final request = await httpClient.getUrl(Uri.parse(url));
+        request.headers.set('Authorization', token);
+        // print('Request headers: ${request.headers}'); // Print request headers
+
+        final response = await request.close();
+        // print("Response Status: ${response.statusCode}");
+
+        final responseBody = await response.transform(utf8.decoder).join();
+        // print("Response Body: $responseBody");
+
+        if (response.statusCode == 200) {
+          final data = json.decode(responseBody);
+          final pointsEarned = data['points_earned'];
+          final lastOpenedDateTime = data['dateTimeUserLastOpenedApp'];
+
+          if (lastOpenedDateTime != null) {
+            final lastOpenedDate = DateTime.parse(lastOpenedDateTime).toLocal();
+            final currentDate = DateTime.now().toLocal();
+            print("Current date is ${currentDate}");
+            if (currentDate.difference(lastOpenedDate).inDays == 0 &&
+                pointsEarned == 1.0) {
+              print('Points already allocated today, not showing animation');
+              return;
+            }
+          }
+
+          print('Updating daily activity and showing animation');
+          await _updateDailyActivityAndStreak();
+          _showTransitionGif();
+        } else {
+          print('Failed to check points: ${response.statusCode}');
+          print('Response body: $responseBody');
+        }
+      } finally {
+        httpClient.close();
+      }
+    } catch (e, stackTrace) {
+      print('Error checking points: $e');
+      print('Stack trace: $stackTrace');
+    }
+  }
+
+  Future<void> _updateDailyActivityAndStreak() async {
+    print("Activated");
   }
 
   void _showTransitionGif() {
@@ -52,7 +121,7 @@ class _HomeScreenState extends State<HomeScreen>
               child: Center(
                 child: Image.asset(
                   'lib/Assets/Image_Comp/Icons/singleCoin.gif',
-                  width: 100 + (50 * _animation.value), // Grow from 100 to 150
+                  width: 100 + (50 * _animation.value),
                   height: 100 + (50 * _animation.value),
                 ),
               ),
