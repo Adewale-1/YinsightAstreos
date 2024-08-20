@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -17,14 +18,13 @@ class focusSection extends StatefulWidget {
   State<focusSection> createState() => focusSectionState();
 }
 
-
 /// The state for the focus section.
-class focusSectionState extends State<focusSection>with WidgetsBindingObserver {
-
+class focusSectionState extends State<focusSection>
+    with WidgetsBindingObserver, SingleTickerProviderStateMixin {
   final TextEditingController _searchController = TextEditingController();
 
   Map<String, bool> taskCompletionStatus = {};
-  
+
   List<String> allTasks = [];
   List<String> displayedTasks = [];
   Map<String, bool> taskStatus = {};
@@ -32,25 +32,38 @@ class focusSectionState extends State<focusSection>with WidgetsBindingObserver {
   Map<String, Timer?> taskTimers = {};
   Map<String, Duration> taskElapsedTimes = {};
   Map<String, String> taskDetails = {};
-   Map<String, String> taskIds = {}; // Map to hold task names and their corresponding IDs
-
+  Map<String, String> taskIds =
+      {}; // Map to hold task names and their corresponding IDs
 
   final TimerService _timerService = TimerService();
 
+  OverlayEntry? _overlayEntry;
+  late AnimationController _animationController;
+  late Animation<double> _animation;
+
+  String activity = "taskCompletion";
+
   @override
   void initState() {
-     super.initState();
-     _fetchTasks();
+    super.initState();
+    _fetchTasks();
     _searchController.addListener(_updateDisplayedTasks);
     _checkFirstTime();
-
-    // Add a listener for the app lifecycle changes
     WidgetsBinding.instance.addObserver(this);
+    _setupAnimation();
 
-    // Fetch the total time spent for each task
     for (final task in allTasks) {
       fetchTotalTimeSpent(task);
     }
+  }
+
+  void _setupAnimation() {
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 2000),
+      vsync: this,
+    );
+    _animation =
+        Tween<double>(begin: 0.0, end: 1.0).animate(_animationController);
   }
 
   /// Shows a dialog to confirm task completion.
@@ -82,6 +95,7 @@ class focusSectionState extends State<focusSection>with WidgetsBindingObserver {
       },
     );
   }
+
   /// Deletes a task.
   ///
   /// [taskName]: The name of the task to delete.
@@ -97,7 +111,8 @@ class focusSectionState extends State<focusSection>with WidgetsBindingObserver {
     try {
       final user = FirebaseAuth.instance.currentUser;
       String? token = await user?.getIdToken();
-      final String url = '${UserInformation.getRoute('deleteTaskOnFocus')}?task_id=$taskId';
+      final String url =
+          '${UserInformation.getRoute('deleteTaskOnFocus')}?task_id=$taskId';
       if (token == null) throw Exception('No token found');
       var response = await http.delete(
         Uri.parse(url),
@@ -117,12 +132,132 @@ class focusSectionState extends State<focusSection>with WidgetsBindingObserver {
           taskIds.remove(taskName);
           taskCompletionStatus.remove(taskName);
         });
+
+        // Check if points should be allocated
+        await _checkAndUpdatePoints();
       } else {
         throw Exception('Failed to delete task');
       }
     } catch (e) {
       // print('Error deleting task: $e');
     }
+  }
+
+  Future<void> _checkAndUpdatePoints() async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      String? token = await user?.getIdToken();
+      if (token == null) {
+        print("No token found");
+        return;
+      }
+
+      final url =
+          '${UserInformation.getRoute('checkForPoints')}/?activity=$activity';
+
+      final httpClient = HttpClient();
+      try {
+        final request = await httpClient.getUrl(Uri.parse(url));
+        request.headers.set('Authorization', token);
+
+        final response = await request.close();
+
+        final responseBody = await response.transform(utf8.decoder).join();
+
+        if (response.statusCode == 200) {
+          final data = json.decode(responseBody);
+          final pointsEarned = data['points_earned'];
+          final lastOpenedDateTime = data['dateOfLastActivity'];
+
+          // print("The date in the backend is : ${lastOpenedDateTime}");
+          if (lastOpenedDateTime != null) {
+            final lastOpenedDate = DateTime.parse(lastOpenedDateTime).toLocal();
+            final currentDate = DateTime.now().toLocal();
+            print("Points earned is : ${pointsEarned}");
+            print("Current date is ${currentDate}");
+            print(
+                "Difference is : ${currentDate.difference(lastOpenedDate).inDays}");
+            if (currentDate.difference(lastOpenedDate).inDays == 0 &&
+                pointsEarned >= 3.0) {
+              print('Points already allocated today, not showing animation');
+              return;
+            }
+          }
+
+          print('Updating daily activity and showing animation');
+          await _updateDailyActivityAndStreak();
+          _showTransitionGif();
+        } else {
+          print('Failed to check points: ${response.statusCode}');
+          print('Response body: $responseBody');
+        }
+      } finally {
+        httpClient.close();
+      }
+    } catch (e, stackTrace) {
+      print('Error checking points: $e');
+      print('Stack trace: $stackTrace');
+    }
+  }
+
+  Future<void> _updateDailyActivityAndStreak() async {
+    final user = FirebaseAuth.instance.currentUser;
+    String? token = await user?.getIdToken();
+
+    if (token == null) {
+      throw Exception('No token found');
+    }
+
+    final httpClient = HttpClient();
+    try {
+      final request = await httpClient
+          .postUrl(Uri.parse(UserInformation.getRoute('allocatePoints')));
+      request.headers.set(HttpHeaders.contentTypeHeader, 'application/json');
+      request.headers.set(HttpHeaders.authorizationHeader, token);
+      request.add(utf8.encode(json.encode({'activity': activity})));
+
+      final response = await request.close();
+      final responseBody =
+          await response.transform(utf8.decoder).join(); // Added line
+      print("The response body is: $responseBody");
+      if (response.statusCode != 200) {
+        throw Exception('Failed to update daily activity and streak');
+      }
+    } finally {
+      httpClient.close();
+    }
+  }
+
+  void _showTransitionGif() {
+    _overlayEntry = OverlayEntry(
+      builder: (context) => AnimatedBuilder(
+        animation: _animation,
+        builder: (context, child) {
+          return Positioned.fill(
+            child: Container(
+              color: Colors.black.withOpacity(0.5 * _animation.value),
+              child: Center(
+                child: Image.asset(
+                  'lib/Assets/Image_Comp/Icons/singleCoin.gif',
+                  width: 100 + (50 * _animation.value),
+                  height: 100 + (50 * _animation.value),
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+
+    Overlay.of(context).insert(_overlayEntry!);
+    _animationController.forward().then((_) {
+      Future.delayed(const Duration(milliseconds: 500), () {
+        _animationController.reverse().then((_) {
+          _overlayEntry?.remove();
+          _overlayEntry = null;
+        });
+      });
+    });
   }
 
   /// Fetches tasks from the backend.
@@ -141,24 +276,27 @@ class focusSectionState extends State<focusSection>with WidgetsBindingObserver {
       );
 
       if (response.statusCode == 200) {
-          var data = jsonDecode(response.body);
-          // print("Data: $data");
-          setState(() {
-            allTasks = List<String>.from(data['tasks_with_expected_time_to_complete'].map((task) => task['name']));
-            displayedTasks = allTasks;
+        var data = jsonDecode(response.body);
+        // print("Data: $data");
+        setState(() {
+          allTasks = List<String>.from(
+              data['tasks_with_expected_time_to_complete']
+                  .map((task) => task['name']));
+          displayedTasks = allTasks;
 
-            for (var task in data['tasks_with_expected_time_to_complete']) {
-              final taskName = task['name'];
-              final taskId = extractTaskId(task['id']); // Extract the task ID
-              final expectedTimeToComplete = task['expectedTimeToComplete'];
-              final formattedExpectedTime = formatTimeToHoursAndMinutes(expectedTimeToComplete);
-              taskIds[taskName] = taskId; // Store the task ID in the map
-              taskStatus[taskName] = false;
-              taskElapsedTimes[taskName] = Duration.zero;
-              taskTimers[taskName] = null;
-              taskDetails[taskName] = formattedExpectedTime;
-            }
-          });
+          for (var task in data['tasks_with_expected_time_to_complete']) {
+            final taskName = task['name'];
+            final taskId = extractTaskId(task['id']); // Extract the task ID
+            final expectedTimeToComplete = task['expectedTimeToComplete'];
+            final formattedExpectedTime =
+                formatTimeToHoursAndMinutes(expectedTimeToComplete);
+            taskIds[taskName] = taskId; // Store the task ID in the map
+            taskStatus[taskName] = false;
+            taskElapsedTimes[taskName] = Duration.zero;
+            taskTimers[taskName] = null;
+            taskDetails[taskName] = formattedExpectedTime;
+          }
+        });
       } else {
         throw Exception('Failed to load tasks');
       }
@@ -179,6 +317,7 @@ class focusSectionState extends State<focusSection>with WidgetsBindingObserver {
       throw Exception('Malformed task ID string: $taskIdString');
     }
   }
+
   /// Formats the time string to hours and minutes.
   ///
   /// [time]: The time string to format.
@@ -196,12 +335,10 @@ class focusSectionState extends State<focusSection>with WidgetsBindingObserver {
   void dispose() {
     _searchController.dispose();
     _timerService.stopTimer();
-    taskTimers.forEach((key, timer) => timer?.cancel()); // Cancel all timers
+    taskTimers.forEach((key, timer) => timer?.cancel());
     taskDetails.clear();
-
-    // Remove the app lifecycle observer
     WidgetsBinding.instance.removeObserver(this);
-
+    _animationController.dispose();
     super.dispose();
   }
 
@@ -238,7 +375,7 @@ class focusSectionState extends State<focusSection>with WidgetsBindingObserver {
   void _checkFirstTime() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool isSecondTime = (prefs.getBool('isSecondTime') ?? true);
-    
+
     if (isSecondTime) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _showWelcomeDialog();
@@ -246,6 +383,7 @@ class focusSectionState extends State<focusSection>with WidgetsBindingObserver {
       await prefs.setBool('isSecondTime', false);
     }
   }
+
   /// Shows a welcome dialog.
   void _showWelcomeDialog() {
     showDialog(
@@ -253,11 +391,9 @@ class focusSectionState extends State<focusSection>with WidgetsBindingObserver {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text("Lets go! 🚀"),
-          content: const Text(
-          "🎯 Welcome to the Focus Section! 🎯\n\n"
-          "Here, you can check out all your tasks along with their estimated completion times 🕘. This handy section helps you track the actual duration each task takes. Need to find something quickly? Just use the search bar 🔎 to zero in on any task.\n\n"
-          "And hey, if you need to take a breather 🥱, no worries! The time you’ve already put in will be safely saved. So, take your time and focus on what matters!"
-          ),
+          content: const Text("🎯 Welcome to the Focus Section! 🎯\n\n"
+              "Here, you can check out all your tasks along with their estimated completion times 🕘. This handy section helps you track the actual duration each task takes. Need to find something quickly? Just use the search bar 🔎 to zero in on any task.\n\n"
+              "And hey, if you need to take a breather 🥱, no worries! The time you’ve already put in will be safely saved. So, take your time and focus on what matters!"),
           actions: <Widget>[
             TextButton(
               child: const Text("Got It!"),
@@ -270,7 +406,6 @@ class focusSectionState extends State<focusSection>with WidgetsBindingObserver {
       },
     );
   }
-
 
   /// Fetches the total time spent on a task from the backend.
   ///
@@ -290,7 +425,8 @@ class focusSectionState extends State<focusSection>with WidgetsBindingObserver {
     }
 
     final response = await http.get(
-      Uri.parse('${UserInformation.getRoute('getTotalTimeSpentForTask')}?task_id=$taskId'),
+      Uri.parse(
+          '${UserInformation.getRoute('getTotalTimeSpentForTask')}?task_id=$taskId'),
       headers: {
         'Authorization': token,
       },
@@ -308,6 +444,7 @@ class focusSectionState extends State<focusSection>with WidgetsBindingObserver {
       throw Exception('Failed to fetch total time spent');
     }
   }
+
   /// Starts a timer for a task.
   ///
   /// [task]: The task to start the timer for.
@@ -321,7 +458,8 @@ class focusSectionState extends State<focusSection>with WidgetsBindingObserver {
       const Duration(seconds: 1),
       (timer) {
         setState(() {
-          taskElapsedTimes[task] = taskElapsedTimes[task]! + const Duration(seconds: 1);
+          taskElapsedTimes[task] =
+              taskElapsedTimes[task]! + const Duration(seconds: 1);
         });
       },
     );
@@ -355,7 +493,8 @@ class focusSectionState extends State<focusSection>with WidgetsBindingObserver {
   ///
   /// [taskName]: The name of the task to update.
   /// [totalTimeSpent]: The total time spent on the task.
-  Future<void> updateTotalTimeSpent(String taskName, String totalTimeSpent) async {
+  Future<void> updateTotalTimeSpent(
+      String taskName, String totalTimeSpent) async {
     final user = FirebaseAuth.instance.currentUser;
     String? token = await user?.getIdToken();
 
@@ -364,7 +503,6 @@ class focusSectionState extends State<focusSection>with WidgetsBindingObserver {
     }
 
     final String taskId = taskIds[taskName] ?? '';
-
 
     final response = await http.post(
       Uri.parse(UserInformation.getRoute('updateTotalTimeSpentForTask')),
@@ -382,6 +520,7 @@ class focusSectionState extends State<focusSection>with WidgetsBindingObserver {
       throw Exception('Failed to update total time spent');
     }
   }
+
   /// Formats a [Duration] object to a string.
   ///
   /// [duration]: The duration to format.
@@ -395,12 +534,13 @@ class focusSectionState extends State<focusSection>with WidgetsBindingObserver {
     return "$hours:$minutes:$seconds";
   }
 
-
   void _updateDisplayedTasks() {
     final query = _searchController.text;
     if (query.isNotEmpty) {
       setState(() {
-        displayedTasks = allTasks.where((task) => task.toLowerCase().contains(query.toLowerCase())).toList();
+        displayedTasks = allTasks
+            .where((task) => task.toLowerCase().contains(query.toLowerCase()))
+            .toList();
       });
     } else {
       setState(() {
@@ -411,7 +551,6 @@ class focusSectionState extends State<focusSection>with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-
     final formattedDate = DateFormat('E MMM dd').format(DateTime.now());
 
     return Scaffold(
@@ -469,7 +608,8 @@ class focusSectionState extends State<focusSection>with WidgetsBindingObserver {
                     itemBuilder: (context, index) {
                       final taskName = displayedTasks[index];
                       // Use the formatDuration method to get the time string
-                      final timeString = formatDuration(taskElapsedTimes[taskName] ?? Duration.zero);
+                      final timeString = formatDuration(
+                          taskElapsedTimes[taskName] ?? Duration.zero);
                       return taskContainer(
                         context,
                         task: taskName,
@@ -478,8 +618,9 @@ class focusSectionState extends State<focusSection>with WidgetsBindingObserver {
                     },
                   )
                 : const Center(
-                    child: Text("No tasks found matching your search.", style: TextStyle(color: Colors.black)),
-            ),
+                    child: Text("No tasks found matching your search.",
+                        style: TextStyle(color: Colors.black)),
+                  ),
           ),
         ],
       ),
@@ -494,7 +635,8 @@ class focusSectionState extends State<focusSection>with WidgetsBindingObserver {
   ///
   /// Returns the task container widget.
 
-  Widget taskContainer(BuildContext context, {required String task, required String time}) {
+  Widget taskContainer(BuildContext context,
+      {required String task, required String time}) {
     return Container(
       margin: const EdgeInsets.all(8.0),
       padding: const EdgeInsets.all(8.0),
@@ -519,6 +661,7 @@ class focusSectionState extends State<focusSection>with WidgetsBindingObserver {
       ),
     );
   }
+
   /// Creates a row widget for the task name and elapsed time.
   ///
   /// [task]: The name of the task.
@@ -533,13 +676,16 @@ class focusSectionState extends State<focusSection>with WidgetsBindingObserver {
           child: Row(
             children: [
               Checkbox(
-                value: taskCompletionStatus[task] ?? false, // Use the completion status
+                value: taskCompletionStatus[task] ??
+                    false, // Use the completion status
                 onChanged: (bool? value) {
                   if (value != null) {
                     setState(() {
-                      taskCompletionStatus[task] = value; // Update the completion status
+                      taskCompletionStatus[task] =
+                          value; // Update the completion status
                       if (value) {
-                        _showDeleteConfirmationDialog(task); // Show the confirmation dialog
+                        _showDeleteConfirmationDialog(
+                            task); // Show the confirmation dialog
                       }
                     });
                   }
@@ -591,8 +737,6 @@ class focusSectionState extends State<focusSection>with WidgetsBindingObserver {
     );
   }
 
-
-
   /// Creates a row widget for the action buttons and time details.
   ///
   /// [task]: The name of the task.
@@ -603,7 +747,9 @@ class focusSectionState extends State<focusSection>with WidgetsBindingObserver {
     Duration? taskElapsedTimeValue = taskElapsedTimes[task];
     String? taskDetailsValue = taskDetails[task];
 
-    if (taskStatusValue == null || taskElapsedTimeValue == null || taskDetailsValue == null) {
+    if (taskStatusValue == null ||
+        taskElapsedTimeValue == null ||
+        taskDetailsValue == null) {
       // Handle the case where any of the required values are null
       return const SizedBox.shrink();
     }
@@ -640,6 +786,7 @@ class focusSectionState extends State<focusSection>with WidgetsBindingObserver {
       ],
     );
   }
+
   /// Creates a column widget for time details.
   ///
   /// [title]: The title of the time detail.
@@ -657,7 +804,6 @@ class focusSectionState extends State<focusSection>with WidgetsBindingObserver {
             fontSize: 12,
           ),
         ),
-
         Text(
           time,
           style: const TextStyle(

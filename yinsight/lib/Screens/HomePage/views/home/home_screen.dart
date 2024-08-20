@@ -30,6 +30,7 @@ class _HomeScreenState extends State<HomeScreen>
 
   get http => null;
   String activity = "userOpenedApp";
+
   @override
   void initState() {
     super.initState();
@@ -58,7 +59,7 @@ class _HomeScreenState extends State<HomeScreen>
       }
 
       final url =
-          '${UserInformation.getRoute('checkForPoints')}?activity=$activity';
+          '${UserInformation.getRoute('checkForPoints')}/?activity=$activity';
       // print('Attempting to call URL: $url');
       // print('Token: $token'); // Print token for debugging
 
@@ -77,12 +78,15 @@ class _HomeScreenState extends State<HomeScreen>
         if (response.statusCode == 200) {
           final data = json.decode(responseBody);
           final pointsEarned = data['points_earned'];
-          final lastOpenedDateTime = data['dateTimeUserLastOpenedApp'];
+          final lastOpenedDateTime = data['dateOfLastActivity'];
 
           if (lastOpenedDateTime != null) {
             final lastOpenedDate = DateTime.parse(lastOpenedDateTime).toLocal();
             final currentDate = DateTime.now().toLocal();
+            print("Points earned is : ${pointsEarned}");
             print("Current date is ${currentDate}");
+            print(
+                "Difference is : ${currentDate.difference(lastOpenedDate).inDays}");
             if (currentDate.difference(lastOpenedDate).inDays == 0 &&
                 pointsEarned == 1.0) {
               print('Points already allocated today, not showing animation');
@@ -107,7 +111,29 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   Future<void> _updateDailyActivityAndStreak() async {
-    print("Activated");
+    final user = FirebaseAuth.instance.currentUser;
+    String? token = await user?.getIdToken();
+
+    if (token == null) {
+      throw Exception('No token found');
+    }
+
+    final httpClient = HttpClient();
+    try {
+      final request = await httpClient
+          .postUrl(Uri.parse(UserInformation.getRoute('allocatePoints')));
+      request.headers.set(HttpHeaders.contentTypeHeader, 'application/json');
+      request.headers.set(HttpHeaders.authorizationHeader, token);
+      request.add(utf8.encode(json.encode({'activity': activity})));
+
+      final response = await request.close();
+
+      if (response.statusCode != 200) {
+        throw Exception('Failed to update daily activity and streak');
+      }
+    } finally {
+      httpClient.close();
+    }
   }
 
   void _showTransitionGif() {

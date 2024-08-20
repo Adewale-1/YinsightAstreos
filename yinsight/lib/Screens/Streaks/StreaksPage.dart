@@ -23,9 +23,11 @@ class _StreaksPageState extends State<StreaksPage> {
     DateTime(2024, 8, 7): 5,
     DateTime(2024, 8, 8): 2,
     DateTime(2024, 8, 11): 8,
-    DateTime(2024, 8, 12): 10,
+    DateTime(2024, 8, 31): 10,
     // Add more data points as needed
   };
+
+  DateTime now = DateTime(2024, 2, 1);
 
   // Controller for the PageView
   PageController _pageController;
@@ -41,6 +43,7 @@ class _StreaksPageState extends State<StreaksPage> {
     if (value <= 2) return Colors.green[100]!;
     if (value <= 5) return Colors.green[300]!;
     if (value <= 8) return Colors.green[500]!;
+    print({now});
     return Colors.green[700]!;
   }
 
@@ -170,14 +173,14 @@ class _StreaksPageState extends State<StreaksPage> {
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Center(
-                                    // child: Text(
-                                    //   dayNumber.toString(),
-                                    //   style: const TextStyle(
-                                    //     color: Colors.black54,
-                                    //     fontWeight: FontWeight.bold,
-                                    //   ),
-                                    // ),
-                                  ),
+                                      // child: Text(
+                                      //   dayNumber.toString(),
+                                      //   style: const TextStyle(
+                                      //     color: Colors.black54,
+                                      //     fontWeight: FontWeight.bold,
+                                      //   ),
+                                      // ),
+                                      ),
                                 );
                               },
                             ),

@@ -20,6 +20,7 @@ class FocusCard extends StatefulWidget {
 }
 
 class _FocusCardState extends State<FocusCard> {
+  
 
   /// Fetches the number of tasks created by the user.
   ///
