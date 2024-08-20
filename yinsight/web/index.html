@@ -32,6 +32,29 @@
   <title>yinsight</title>
   <link rel="manifest" href="manifest.json">
 
+  <script type="module">
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "firebase/app";
+    import { getAnalytics } from "firebase/analytics";
+    // TODO: Add SDKs for Firebase products that you want to use
+    // https://firebase.google.com/docs/web/setup#available-libraries
+
+    // Your web app's Firebase configuration
+    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+    const firebaseConfig = {
+      apiKey: "AIzaSyC6bmaF0DhYvbJy8W_4K47q_N8kcxfSDH8",
+      authDomain: "micro-atrium-416500.firebaseapp.com",
+      projectId: "micro-atrium-416500",
+      storageBucket: "micro-atrium-416500.appspot.com",
+      messagingSenderId: "196058467173",
+      appId: "1:196058467173:web:dcda49b78606ee92fdaf8c",
+      measurementId: "G-BRPL44T6M6"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+  </script>
   <script>
     // The value below is injected by flutter build, do not touch.
     const serviceWorkerVersion = null;

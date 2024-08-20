@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
-
+import 'dart:io';
+import 'package:flutter/widgets.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -23,7 +24,7 @@ class Recall extends StatefulWidget {
   State<Recall> createState() => _RecallState();
 }
 
-class _RecallState extends State<Recall> with TickerProviderStateMixin{
+class _RecallState extends State<Recall> with TickerProviderStateMixin {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   late final WelcomeService _welcomeService;
 
@@ -33,21 +34,46 @@ class _RecallState extends State<Recall> with TickerProviderStateMixin{
   String? selectedFilePath;
   bool notEnableDelete = false;
   bool showCancelOption = false;
+  late AnimationController _animationController;
+  late Animation<double> _animation;
+  OverlayEntry? _overlayEntry;
+  String activity1 = "fileUpload";
+  String activity2 = "flashcardGeneration";
+  String activity3 = "showQuestion";
 
-    final bool _isDialogShown = false;
+  final bool _isDialogShown = false;
 
   @override
   void initState() {
     super.initState();
     _fetchUploadedFiles();
-    AwesomeNotifications().setListeners(onActionReceivedMethod: NotificationService.onActionReceivedMethod, onDismissActionReceivedMethod: NotificationService.onDismissActionReceivedMethod, onNotificationCreatedMethod: NotificationService.onNotificationCreatedMethod, onNotificationDisplayedMethod: NotificationService.onNotificationDisplayedMethod);
+    _setupAnimation();
+    AwesomeNotifications().setListeners(
+        onActionReceivedMethod: NotificationService.onActionReceivedMethod,
+        onDismissActionReceivedMethod:
+            NotificationService.onDismissActionReceivedMethod,
+        onNotificationCreatedMethod:
+            NotificationService.onNotificationCreatedMethod,
+        onNotificationDisplayedMethod:
+            NotificationService.onNotificationDisplayedMethod);
     _welcomeService = WelcomeService(_scaffoldKey);
     _welcomeService.checkAndShowWelcomeDialog();
   }
-  
 
+  void _setupAnimation() {
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 2000),
+      vsync: this,
+    );
+    _animation =
+        Tween<double>(begin: 0.0, end: 1.0).animate(_animationController);
+  }
 
-
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
 
   /// Shows a confirmation dialog for deleting all files.
   ///
@@ -78,8 +104,9 @@ class _RecallState extends State<Recall> with TickerProviderStateMixin{
           ],
         );
       },
-  );
+    );
   }
+
   /// Deletes all files.
   void _deleteAll() {
     setState(() {
@@ -105,10 +132,10 @@ class _RecallState extends State<Recall> with TickerProviderStateMixin{
   ///
   /// [index]: The index of the file to delete.
   Future<void> _onDeleteFile(int index) async {
-
     final String fileName = filePaths[index];
 
-    final String url = '${UserInformation.getRoute('deletePDF')}?file_name=$fileName';
+    final String url =
+        '${UserInformation.getRoute('deletePDF')}?file_name=$fileName';
 
     final user = FirebaseAuth.instance.currentUser;
     String? token = await user?.getIdToken();
@@ -188,7 +215,6 @@ class _RecallState extends State<Recall> with TickerProviderStateMixin{
     });
   }
 
-
   /// Builds the content of the drawer.
   ///
   /// [filePaths]: The list of file paths.
@@ -212,7 +238,8 @@ class _RecallState extends State<Recall> with TickerProviderStateMixin{
               ),
             ),
             ListTile(
-              leading: const Icon(Icons.question_answer_sharp, color: Colors.white),
+              leading:
+                  const Icon(Icons.question_answer_sharp, color: Colors.white),
               title: const Text('Show Questions',
                   style: TextStyle(color: Colors.white)),
               onTap: () {
@@ -281,6 +308,42 @@ class _RecallState extends State<Recall> with TickerProviderStateMixin{
     }
   }
 
+  void _showTransitionGif() {
+    // Use a post-frame callback to ensure we have a valid context
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return; // Check if the widget is still in the tree
+
+      _overlayEntry = OverlayEntry(
+        builder: (BuildContext context) => AnimatedBuilder(
+          animation: _animation,
+          builder: (BuildContext context, Widget? child) {
+            return Positioned.fill(
+              child: Container(
+                color: Colors.black.withOpacity(0.5 * _animation.value),
+                child: Center(
+                  child: Image.asset(
+                    'lib/Assets/Image_Comp/Icons/singleCoin.gif',
+                    width: 100 + (50 * _animation.value),
+                    height: 100 + (50 * _animation.value),
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      );
+
+      Overlay.of(this.context).insert(_overlayEntry!);
+      _animationController.forward().then((_) {
+        Future.delayed(const Duration(milliseconds: 500), () {
+          _animationController.reverse().then((_) {
+            _overlayEntry?.remove();
+            _overlayEntry = null;
+          });
+        });
+      });
+    });
+  }
 
   /// Uploads a file to the server.
   ///
@@ -303,11 +366,99 @@ class _RecallState extends State<Recall> with TickerProviderStateMixin{
       var response = await request.send();
       if (response.statusCode == 200) {
         await _fetchUploadedFiles(); // Fetch the updated list of uploaded files
+        await _checkAndUpdatePoints();
       } else {
         throw Exception('Failed to upload file');
       }
     } catch (e) {
       throw Exception('Error uploading file: $e');
+    }
+  }
+
+  Future<void> _checkAndUpdatePoints() async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      String? token = await user?.getIdToken();
+      if (token == null) {
+        print("No token found");
+        return;
+      }
+
+      final url =
+          '${UserInformation.getRoute('checkForPoints')}/?activity=$activity1';
+      // print('Attempting to call URL: $url');
+      // print('Token: $token'); // Print token for debugging
+
+      final httpClient = HttpClient();
+      try {
+        final request = await httpClient.getUrl(Uri.parse(url));
+        request.headers.set('Authorization', token);
+        // print('Request headers: ${request.headers}'); // Print request headers
+
+        final response = await request.close();
+        // print("Response Status: ${response.statusCode}");
+
+        final responseBody = await response.transform(utf8.decoder).join();
+        // print("Response Body: $responseBody");
+
+        if (response.statusCode == 200) {
+          final data = json.decode(responseBody);
+          final pointsEarned = data['points_earned'];
+          final lastOpenedDateTime = data['dateOfLastActivity'];
+
+          if (lastOpenedDateTime != null) {
+            final lastOpenedDate = DateTime.parse(lastOpenedDateTime).toLocal();
+            final currentDate = DateTime.now().toLocal();
+            print("Points earned is : $pointsEarned");
+            print("Current date is $currentDate");
+            print(
+                "Difference is : ${currentDate.difference(lastOpenedDate).inDays}");
+            if (currentDate.difference(lastOpenedDate).inDays == 0 &&
+                pointsEarned == 1.0) {
+              print('Points already allocated today, not showing animation');
+              return;
+            }
+          }
+
+          print('Updating daily activity and showing animation');
+          await _updateDailyActivityAndStreak();
+          _showTransitionGif();
+        } else {
+          print('Failed to check points: ${response.statusCode}');
+          print('Response body: $responseBody');
+        }
+      } finally {
+        httpClient.close();
+      }
+    } catch (e, stackTrace) {
+      print('Error checking points: $e');
+      print('Stack trace: $stackTrace');
+    }
+  }
+
+  Future<void> _updateDailyActivityAndStreak() async {
+    final user = FirebaseAuth.instance.currentUser;
+    String? token = await user?.getIdToken();
+
+    if (token == null) {
+      throw Exception('No token found');
+    }
+
+    final httpClient = HttpClient();
+    try {
+      final request = await httpClient
+          .postUrl(Uri.parse(UserInformation.getRoute('allocatePoints')));
+      request.headers.set(HttpHeaders.contentTypeHeader, 'application/json');
+      request.headers.set(HttpHeaders.authorizationHeader, token);
+      request.add(utf8.encode(json.encode({'activity': activity1})));
+
+      final response = await request.close();
+
+      if (response.statusCode != 200) {
+        throw Exception('Failed to update daily activity and streak');
+      }
+    } finally {
+      httpClient.close();
     }
   }
 
@@ -334,8 +485,6 @@ class _RecallState extends State<Recall> with TickerProviderStateMixin{
     }
   }
 
-
-
   /// Checks if a file already exists in the list of file paths.
   ///
   /// [filePath]: The path of the file to check.
@@ -349,16 +498,16 @@ class _RecallState extends State<Recall> with TickerProviderStateMixin{
     return false;
   }
 
-
   /// Resets the state of the widget.
   void _resetState() {
     setState(() {
       selectedFiles.clear();
       isSelectionModeEnabled = false;
       showCancelOption = false;
-      notEnableDelete = false;  // Reset other flags as needed
+      notEnableDelete = false; // Reset other flags as needed
     });
   }
+
   /// Builds the app bar.
   ///
   /// [context]: The build context.
@@ -366,90 +515,88 @@ class _RecallState extends State<Recall> with TickerProviderStateMixin{
   /// Returns an [AppBar] widget.
   AppBar _buildAppBar(BuildContext context) {
     return AppBar(
-        actions: selectedFiles.isNotEmpty
-            ? [
-                // Text button called Undo and another called Proceed
-                TextButton(
-                  onPressed: () {
-                    setState(() {
-                      showCancelOption = false;
-                      notEnableDelete = false;
-                      selectedFiles.clear();
-                      isSelectionModeEnabled =
-                          false; // Optional, to exit selection mode
-                    });
-                  },
-                  child: Text(
-                    "Undo",
-                    style: GoogleFonts.lexend(
-                      textStyle: const TextStyle(
-                        color: Colors.blue,
-                        fontSize: 16.0,
-                        fontWeight: FontWeight.normal,
-                      ),
+      actions: selectedFiles.isNotEmpty
+          ? [
+              // Text button called Undo and another called Proceed
+              TextButton(
+                onPressed: () {
+                  setState(() {
+                    showCancelOption = false;
+                    notEnableDelete = false;
+                    selectedFiles.clear();
+                    isSelectionModeEnabled =
+                        false; // Optional, to exit selection mode
+                  });
+                },
+                child: Text(
+                  "Undo",
+                  style: GoogleFonts.lexend(
+                    textStyle: const TextStyle(
+                      color: Colors.blue,
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.normal,
                     ),
                   ),
                 ),
-                TextButton(
-                  onPressed: () {
-                    // Implement the logic for Proceed
-                    RecallHelpers.proceedWithSelectedFiles(
-                        selectedFiles, context, _resetState);
-                  },
-                  child: Text(
-                    "Proceed",
-                    style: GoogleFonts.lexend(
-                      textStyle: const TextStyle(
-                        color: Colors.blue,
-                        fontSize: 16.0,
-                        fontWeight: FontWeight.normal,
-                      ),
+              ),
+              TextButton(
+                onPressed: () {
+                  // Implement the logic for Proceed
+                  RecallHelpers.proceedWithSelectedFiles(
+                      selectedFiles, context, _resetState);
+                },
+                child: Text(
+                  "Proceed",
+                  style: GoogleFonts.lexend(
+                    textStyle: const TextStyle(
+                      color: Colors.blue,
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.normal,
                     ),
                   ),
                 ),
-              ]
-            : showCancelOption && filePaths.isNotEmpty
-                ? [
-                    TextButton(
-                      onPressed: () {
-                        setState(() {
-                          showCancelOption = false;
-                          notEnableDelete = false;
-                          selectedFiles.clear();
-                          isSelectionModeEnabled = false;
-                        });
-                      },
-                      child: Text(
-                        "Cancel",
-                        style: GoogleFonts.lexend(
-                          textStyle: const TextStyle(
-                            color: Colors.blue,
-                            fontSize: 16.0,
-                            fontWeight: FontWeight.normal,
-                          ),
+              ),
+            ]
+          : showCancelOption && filePaths.isNotEmpty
+              ? [
+                  TextButton(
+                    onPressed: () {
+                      setState(() {
+                        showCancelOption = false;
+                        notEnableDelete = false;
+                        selectedFiles.clear();
+                        isSelectionModeEnabled = false;
+                      });
+                    },
+                    child: Text(
+                      "Cancel",
+                      style: GoogleFonts.lexend(
+                        textStyle: const TextStyle(
+                          color: Colors.blue,
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.normal,
                         ),
                       ),
-                    )
-                  ]
-                : null,
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(
-            Icons.menu,
-            color: Colors.black,
-          ),
-          onPressed: () {
-            _scaffoldKey.currentState!.openDrawer();
-          },
+                    ),
+                  )
+                ]
+              : null,
+      backgroundColor: Colors.white,
+      elevation: 0,
+      leading: IconButton(
+        icon: const Icon(
+          Icons.menu,
+          color: Colors.black,
         ),
-      );
+        onPressed: () {
+          _scaffoldKey.currentState!.openDrawer();
+        },
+      ),
+    );
   }
-
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: Colors.white,
@@ -462,15 +609,15 @@ class _RecallState extends State<Recall> with TickerProviderStateMixin{
               : FileListView(
                   filePaths: filePaths,
                   notEnableDelete: notEnableDelete,
-                  onDeleteFile:  _onDeleteFile,
+                  onDeleteFile: _onDeleteFile,
                   selectedFiles: selectedFiles,
                   isSelectionModeEnabled: isSelectionModeEnabled,
-                  onFileSelected: (index, isSelected) => _handleFileSelection(context, index, isSelected),
+                  onFileSelected: (index, isSelected) =>
+                      _handleFileSelection(context, index, isSelected),
                 ),
           RecallHelpers.fadeUpWidget(_addFile),
         ],
       ),
     );
   }
-
 }

@@ -71,7 +71,7 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
               : ListView.builder(
                 itemCount: questions.length,
                 itemBuilder: (context, index) {
-                  String? selectedAnswer; 
+                  // String? selectedAnswer; 
                   return Container(
                     width: double.infinity,  // Ensures the container takes up the full width available
                     padding: const EdgeInsets.all(10),  // Padding around each question item for better spacing

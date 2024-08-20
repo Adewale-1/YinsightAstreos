@@ -5,7 +5,8 @@ import 'package:yinsight/Screens/HomePage/views/home/home_screen.dart';
 import 'package:yinsight/Screens/HomePage/widgets/settings.dart';
 import 'package:yinsight/Screens/Recall/views/recall_screen.dart';
 import 'package:yinsight/Screens/Reflection/CardScreen.dart';
-
+import 'package:yinsight/Screens/Streaks/FlipCard.dart';
+import 'package:yinsight/Screens/Streaks/StreaksPage.dart';
 
 /// The main navigation screen of the application.
 class MainNavigationScreen extends StatefulWidget {
@@ -36,7 +37,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     const focusSection(),
     const Recall(),
     const CardScreen(),
-    const SettingsScreen(),
+    // const SettingsScreen(),
+    StreaksPage(),
+
   ];
 
   void _navigateToSection(int index) {
@@ -61,8 +64,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           Icon(Icons.settings, size: 30, color: Colors.white),
         ],
         color: Colors.grey[800]!, // Ensure this is the desired color
-        backgroundColor: Colors.transparent, 
-        buttonBackgroundColor: Colors.grey[850], // Ensure this is the desired button background color
+        backgroundColor: Colors.transparent,
+        buttonBackgroundColor: Colors
+            .grey[850], // Ensure this is the desired button background color
         animationCurve: Curves.easeInOut,
         animationDuration: const Duration(milliseconds: 600),
         onTap: (index) => setState(() => _currentIndex = index),

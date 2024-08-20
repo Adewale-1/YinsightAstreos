@@ -688,7 +688,6 @@ class focusSection extends StatefulWidget {
   State<focusSection> createState() => focusSectionState();
 }
 
-
 /// The state for the focus section.
 class focusSectionState extends State<focusSection>with WidgetsBindingObserver {
   final TextEditingController _searchController = TextEditingController();
@@ -710,8 +709,8 @@ class focusSectionState extends State<focusSection>with WidgetsBindingObserver {
 
   @override
   void initState() {
-     super.initState();
-     _fetchTasks();
+    super.initState();
+    _fetchTasks();
     _searchController.addListener(_updateDisplayedTasks);
     _checkFirstTime();
 
@@ -941,7 +940,6 @@ class focusSectionState extends State<focusSection>with WidgetsBindingObserver {
  
   @override
   Widget build(BuildContext context) {
-
     final formattedDate = DateFormat('E MMM dd').format(DateTime.now());
 
     return Scaffold(

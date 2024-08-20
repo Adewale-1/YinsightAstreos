@@ -1,7 +1,11 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:yinsight/Globals/services/userInfo.dart';
 import 'package:yinsight/Screens/HomePage/services/navigation_service.dart';
 import 'package:yinsight/Screens/HomePage/widgets/assignment_info_card.dart';
 import 'package:yinsight/Screens/HomePage/widgets/avatar.dart';
@@ -11,7 +15,6 @@ import 'package:yinsight/Screens/HomePage/widgets/progress_info_card.dart';
 import 'package:yinsight/Screens/HomePage/widgets/recall_card.dart';
 import 'package:yinsight/Screens/HomePage/widgets/reflection_card.dart';
 
-/// The main screen of the application.
 class HomeScreen extends StatefulWidget {
   const HomeScreen({
     super.key,
@@ -27,20 +30,164 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
-  final user  = FirebaseAuth.instance.currentUser;
+class _HomeScreenState extends State<HomeScreen>
+    with SingleTickerProviderStateMixin {
+  final user = FirebaseAuth.instance.currentUser;
+  OverlayEntry? _overlayEntry;
+  late AnimationController _animationController;
+  late Animation<double> _animation;
 
+  get http => null;
+  String activity = "userOpenedApp";
 
   @override
   void initState() {
     super.initState();
     _checkFirstTime();
+    _setupAnimation();
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => _checkAndUpdatePoints());
   }
+
+  void _setupAnimation() {
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 2000),
+      vsync: this,
+    );
+    _animation =
+        Tween<double>(begin: 0.0, end: 1.0).animate(_animationController);
+  }
+
+  Future<void> _checkAndUpdatePoints() async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      String? token = await user?.getIdToken();
+      if (token == null) {
+        print("No token found");
+        return;
+      }
+
+      final url =
+          '${UserInformation.getRoute('checkForPoints')}/?activity=$activity';
+      // print('Attempting to call URL: $url');
+      // print('Token: $token'); // Print token for debugging
+
+      final httpClient = HttpClient();
+      try {
+        final request = await httpClient.getUrl(Uri.parse(url));
+        request.headers.set('Authorization', token);
+        // print('Request headers: ${request.headers}'); // Print request headers
+
+        final response = await request.close();
+        // print("Response Status: ${response.statusCode}");
+
+        final responseBody = await response.transform(utf8.decoder).join();
+        // print("Response Body: $responseBody");
+
+        if (response.statusCode == 200) {
+          final data = json.decode(responseBody);
+          final pointsEarned = data['points_earned'];
+          final lastOpenedDateTime = data['dateOfLastActivity'];
+
+          if (lastOpenedDateTime != null) {
+            final lastOpenedDate = DateTime.parse(lastOpenedDateTime).toLocal();
+            final currentDate = DateTime.now().toLocal();
+            print("Points earned is : ${pointsEarned}");
+            print("Current date is ${currentDate}");
+            print(
+                "Difference is : ${currentDate.difference(lastOpenedDate).inDays}");
+            if (currentDate.difference(lastOpenedDate).inDays == 0 &&
+                pointsEarned == 1.0) {
+              print('Points already allocated today, not showing animation');
+              return;
+            }
+          }
+
+          print('Updating daily activity and showing animation');
+          await _updateDailyActivityAndStreak();
+          _showTransitionGif();
+        } else {
+          print('Failed to check points: ${response.statusCode}');
+          print('Response body: $responseBody');
+        }
+      } finally {
+        httpClient.close();
+      }
+    } catch (e, stackTrace) {
+      print('Error checking points: $e');
+      print('Stack trace: $stackTrace');
+    }
+  }
+
+  Future<void> _updateDailyActivityAndStreak() async {
+    final user = FirebaseAuth.instance.currentUser;
+    String? token = await user?.getIdToken();
+
+    if (token == null) {
+      throw Exception('No token found');
+    }
+
+    final httpClient = HttpClient();
+    try {
+      final request = await httpClient
+          .postUrl(Uri.parse(UserInformation.getRoute('allocatePoints')));
+      request.headers.set(HttpHeaders.contentTypeHeader, 'application/json');
+      request.headers.set(HttpHeaders.authorizationHeader, token);
+      request.add(utf8.encode(json.encode({'activity': activity})));
+
+      final response = await request.close();
+
+      if (response.statusCode != 200) {
+        throw Exception('Failed to update daily activity and streak');
+      }
+    } finally {
+      httpClient.close();
+    }
+  }
+
+  void _showTransitionGif() {
+    _overlayEntry = OverlayEntry(
+      builder: (context) => AnimatedBuilder(
+        animation: _animation,
+        builder: (context, child) {
+          return Positioned.fill(
+            child: Container(
+              color: Colors.black.withOpacity(0.5 * _animation.value),
+              child: Center(
+                child: Image.asset(
+                  'lib/Assets/Image_Comp/Icons/singleCoin.gif',
+                  width: 100 + (50 * _animation.value),
+                  height: 100 + (50 * _animation.value),
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+
+    Overlay.of(context).insert(_overlayEntry!);
+    _animationController.forward().then((_) {
+      Future.delayed(const Duration(milliseconds: 500), () {
+        _animationController.reverse().then((_) {
+          _overlayEntry?.remove();
+          _overlayEntry = null;
+        });
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
   /// Checks if this is the user's first time opening the app.
   void _checkFirstTime() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool isFirstTime = (prefs.getBool('isFirstTime') ?? true);
-    
+
     if (isFirstTime) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _showWelcomeDialog();
@@ -48,6 +195,7 @@ class _HomeScreenState extends State<HomeScreen> {
       await prefs.setBool('isFirstTime', false);
     }
   }
+
   /// Shows a welcome dialog when the user opens the app for the first time.
   void _showWelcomeDialog() {
     showDialog(
@@ -55,10 +203,9 @@ class _HomeScreenState extends State<HomeScreen> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text("Welcome!😀"),
-          content: const Text(
-          "🗓️ Welcome to the Plan Section! 🗓️\n\n"
-          "In this area, you can view all your tasks sorted by priority in the 'Task Notes' 📝.\n\n Ready to schedule? Simply drag and drop tasks from the list on the left into the calendar on the right.\n\n"
-        ),
+          content: const Text("🗓️ Welcome to the Plan Section! 🗓️\n\n"
+              "In this area, you can view all your tasks sorted by priority in the 'Task Notes' 📝.\n\n"
+              "Ready to schedule? Simply drag and drop tasks from the list on the left into the calendar on the right.\n\n"),
           actions: <Widget>[
             TextButton(
               child: const Text("Got It!"),
@@ -72,7 +219,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
@@ -86,63 +232,61 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              AvatarWidget(), // Refactored to widgets/avatar.dart
-              // ... other components
+              AvatarWidget(),
               const SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(5, 0, 0, 0),
-                      child: Text('Overview',
-                            style: GoogleFonts.lexend(
-                            textStyle: const TextStyle(
-                            color: Colors.black,
-                            fontSize: 20.0,
-                            fontWeight: FontWeight.w600,
-                          ),
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(5, 0, 0, 0),
+                    child: Text(
+                      'Overview',
+                      style: GoogleFonts.lexend(
+                        textStyle: const TextStyle(
+                          color: Colors.black,
+                          fontSize: 20.0,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
-                    TextButton(
-                      onPressed: () {
-                        NavigationService.navigateToCalendar(context);
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.all(7.0),
-                        decoration: BoxDecoration(
-                          color: Colors.blue,
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: Colors.blue),
-                        ),
-                        child: Row(
-                          children: [
-                            Text(
-                              'Year at a Glance',
-                              style: GoogleFonts.lexend(
-                                textStyle: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 12.0,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      NavigationService.navigateToCalendar(context);
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(7.0),
+                      decoration: BoxDecoration(
+                        color: Colors.blue,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: Colors.blue),
+                      ),
+                      child: Row(
+                        children: [
+                          Text(
+                            'Year at a Glance',
+                            style: GoogleFonts.lexend(
+                              textStyle: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 12.0,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
-                            const Icon(
-                              Icons.arrow_drop_down,
-                              color: Colors.white,
-                            ),
-                          ],
-                        ),
+                          ),
+                          const Icon(
+                            Icons.arrow_drop_down,
+                            color: Colors.white,
+                          ),
+                        ],
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
+              ),
               const SizedBox(height: 10),
-
-
               Expanded(
                 child: ListView(
-                   children: [
+                  children: [
                     const CardScheduleWidget(height: 400),
                     const SizedBox(height: 20),
 
