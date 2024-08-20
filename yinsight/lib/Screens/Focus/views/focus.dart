@@ -1,3 +1,4 @@
+
 // import 'dart:async';
 // import 'dart:convert';
 
@@ -714,14 +715,29 @@ class focusSectionState extends State<focusSection>with WidgetsBindingObserver {
     _searchController.addListener(_updateDisplayedTasks);
     _checkFirstTime();
 
+
+
     // Add a listener for the app lifecycle changes
     WidgetsBinding.instance.addObserver(this);
   }
 
   @override
-  void dispose() {
+  void dispose() async {
     _searchController.dispose();
     _timerService.stopAllTimers();
+
+    for (var task in allTasks) {
+      var taskId = taskIds[task];
+      if (taskId != null) {
+        try {
+          final time = TaskUtils.formatDuration(taskElapsedTimes[task]!);
+          await _focusService.updateTotalTimeSpent(taskId, time);
+
+        } catch (e) {
+          print(e);
+        }
+      }
+    }
 
     // Remove the app lifecycle observer
     WidgetsBinding.instance.removeObserver(this);
@@ -766,10 +782,16 @@ class focusSectionState extends State<focusSection>with WidgetsBindingObserver {
   ///
   /// [taskName]: The name of the task to fetch the total time for.
   Future<void> _fetchElapsedTimes() async {
+    // update the time to make sure each task has a total_time_spent field
+
     for (var task in allTasks) {
       var taskId = taskIds[task];
       if (taskId != null) {
         try {
+
+          // final time = TaskUtils.formatDuration(taskElapsedTimes[task]!);
+          // await _focusService.updateTotalTimeSpent(taskId, time);
+
           final totalTimeSpent = await _focusService.fetchTotalTimeSpent(taskId);
           final duration = TaskUtils.parseDuration(totalTimeSpent);
           setState(() {
@@ -836,7 +858,7 @@ class focusSectionState extends State<focusSection>with WidgetsBindingObserver {
     });
 
     if (taskStatus[taskName] ?? false) {
-      _timerService.startTimer(taskName, (elapsedTime) => _updateElapsedTime(taskName, elapsedTime));
+      _timerService.startTimer(taskName, (elapsedTime) => _updateElapsedTime(taskName, elapsedTime), taskElapsedTimes[taskName]!);
     } else {
       _timerService.pauseTimer(taskName);
     }
@@ -888,8 +910,8 @@ class focusSectionState extends State<focusSection>with WidgetsBindingObserver {
     if (taskId != null) {
       _timerService.stopTimer(task);
       try {
-        final totalTimeSpent = TaskUtils.formatDuration(taskElapsedTimes[task]!);
-        await _focusService.updateTotalTimeSpent(taskId, totalTimeSpent);
+        //final totalTimeSpent = TaskUtils.formatDuration(taskElapsedTimes[task]!);
+        //await _focusService.updateTotalTimeSpent(taskId, totalTimeSpent);
         await _focusService.deleteTask(taskId);
         setState(() {
           allTasks.remove(task);

@@ -415,7 +415,7 @@ class _AddTaskPageState extends ConsumerState<AddTaskPage> {
                         endTime: _selectedEndTime,
                         expectedTimeToComplete: formattedExpectedTime,
                         actualTimeToComplete: '', // Consider what default or placeholder to use
-                        totalTimeSpent: '',      // Consider what default or placeholder to use
+                        totalTimeSpent: '00:00:00',      // Consider what default or placeholder to use
                         recurrence: '',            // Initialize with an actual reminder value or manage as required
                       );
 

@@ -1,3 +1,4 @@
+
 // import 'dart:async';
 
 // /// A service to manage timers.
@@ -32,8 +33,9 @@ class TimerService {
   ///
   /// [taskId]: The identifier of the task.
   /// [onUpdate]: The function to call on each timer tick, with the elapsed time as a parameter.
-  void startTimer(String taskId, Function(Duration) onUpdate) {
+  void startTimer(String taskId, Function(Duration) onUpdate, Duration elapsedTime) {
     stopTimer(taskId); // Ensure no duplicate timer exists for the task
+    updateElapsedTime(taskId, elapsedTime);
 
     _onUpdateCallbacks[taskId] = onUpdate;
     _elapsedTimes[taskId] ??= Duration.zero;
@@ -79,7 +81,7 @@ class TimerService {
   //   });
   // }
 
-    // Save the timers' state to persistent storage (SharedPreferences)
+  // Save the timers' state to persistent storage (SharedPreferences)
   Future<void> saveTimersState() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     _elapsedTimes.forEach((taskId, elapsedTime) {
@@ -96,7 +98,7 @@ class TimerService {
         Duration elapsedTime = Duration(seconds: elapsedSeconds);
         _elapsedTimes[taskId] = elapsedTime;
         onUpdate(taskId, elapsedTime);
-        startTimer(taskId, (newElapsedTime) => onUpdate(taskId, newElapsedTime));
+        startTimer(taskId, (newElapsedTime) => onUpdate(taskId, newElapsedTime), elapsedTime);
       }
     }
   }

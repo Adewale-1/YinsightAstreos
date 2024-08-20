@@ -1,3 +1,4 @@
+
 class TaskUtils {
   
   /// Extracts the task ID from the given string.
@@ -33,12 +34,13 @@ class TaskUtils {
   /// Returns the parsed [Duration] object.
   static Duration parseDuration(String input) {
     final parts = input.split(':');
-    if (parts.length != 2) {
+    if (parts.length != 3) {
       return Duration.zero;
     }
     final hours = int.parse(parts[0]);
     final minutes = int.parse(parts[1]);
-    return Duration(hours: hours, minutes: minutes);
+    final seconds = int.parse(parts[2]);
+    return Duration(hours: hours, minutes: minutes, seconds:  seconds);
   }
 
   /// Formats a [Duration] object to a string.
