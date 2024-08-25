@@ -399,12 +399,27 @@ class _AddTaskPageState extends ConsumerState<AddTaskPage> {
                           priorityEnum = TaskPriority.low; // Default case if nothing matches
                       }
                       String formattedExpectedTime = '';
-                      if (_selectedHour != null && _selectedMinute != null) {
+
+                      if (_selectedHour != null && _selectedMinute == null) {
+                        setState(() {
+                          _selectedMinute = 0;
+                        });
+
+                        formattedExpectedTime = "${_selectedHour.toString().padLeft(2, '0')}:${_selectedMinute.toString().padLeft(2, '0')}";
+
+                      } else if (_selectedHour != null && _selectedMinute != null) {
                         formattedExpectedTime = "${_selectedHour.toString().padLeft(2, '0')}:${_selectedMinute.toString().padLeft(2, '0')}";
                       } else {
                         // Handle cases where hour or minute is not selected
                         // You might want to alert the user or provide default values
-                      }
+                    }
+
+                      // if (_selectedHour != null && _selectedMinute != null) {
+                      //   formattedExpectedTime = "${_selectedHour.toString().padLeft(2, '0')}:${_selectedMinute.toString().padLeft(2, '0')}";
+                      // } else {
+                      //   // Handle cases where hour or minute is not selected
+                      //   // You might want to alert the user or provide default values
+                      // }
                       Task newTask = Task(
                         id: UniqueKey().toString(),
                         name: _titleController.text,

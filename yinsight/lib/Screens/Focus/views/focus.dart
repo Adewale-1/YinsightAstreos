@@ -185,6 +185,9 @@ class focusSectionState extends State<focusSection>
               child: const Text('No'),
               onPressed: () {
                 Navigator.of(context).pop(false);
+                setState(() {
+                  taskCompletionStatus[task] = false;
+                });
               },
             ),
             TextButton(
@@ -226,9 +229,9 @@ class focusSectionState extends State<focusSection>
     if (value != null) {
       setState(() {
         if (value) {
+          taskCompletionStatus[taskName] = true;
           _showDeleteConfirmationDialog(taskName);
         }
-        taskCompletionStatus[taskName] = value;
       });
     }
   }
