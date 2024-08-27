@@ -92,8 +92,8 @@ class _HomeScreenState extends State<HomeScreen>
           if (lastOpenedDateTime != null) {
             final lastOpenedDate = DateTime.parse(lastOpenedDateTime).toLocal();
             final currentDate = DateTime.now().toLocal();
-            print("Points earned is : ${pointsEarned}");
-            print("Current date is ${currentDate}");
+            print("Points earned is : $pointsEarned");
+            print("Current date is $currentDate");
             print(
                 "Difference is : ${currentDate.difference(lastOpenedDate).inDays}");
             if (currentDate.difference(lastOpenedDate).inDays == 0 &&

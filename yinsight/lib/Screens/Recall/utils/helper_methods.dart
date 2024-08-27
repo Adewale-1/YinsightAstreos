@@ -1,4 +1,3 @@
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -19,12 +18,14 @@ class RecallHelpers {
       builder: (BuildContext dialogContext) {
         return AlertDialog(
           // title: Text('Notification'),
-          content: Text('You can only select 1 file.\n\nUpgrade to premium to select more files.'),
+          content: const Text(
+              'You can only select 1 file.\n\nUpgrade to premium to select more files.'),
           actions: <Widget>[
             TextButton(
-              child: Text('Got it!'),
+              child: const Text('Got it!'),
               onPressed: () {
-                Navigator.of(dialogContext).pop();  // Make sure to use `dialogContext` here for clarity.
+                Navigator.of(dialogContext)
+                    .pop(); // Make sure to use `dialogContext` here for clarity.
               },
             ),
           ],
@@ -47,12 +48,13 @@ class RecallHelpers {
       context: context,
       builder: (BuildContext dialogContext) {
         return AlertDialog(
-          content: Text('You have not added any Files'),
+          content: const Text('You have not added any Files'),
           actions: <Widget>[
             TextButton(
-              child: Text('Got it!'),
+              child: const Text('Got it!'),
               onPressed: () {
-                Navigator.of(dialogContext).pop();  // Make sure to use `dialogContext` here for clarity.
+                Navigator.of(dialogContext)
+                    .pop(); // Make sure to use `dialogContext` here for clarity.
               },
             ),
           ],
@@ -68,7 +70,7 @@ class RecallHelpers {
   /// [index]: The index of the file to be deleted.
   /// [deleteFileCallback]: The callback function to delete the file.
   static void DeleteConfirmation(BuildContext context, String filePaths,
-    int index, Function(int) deleteFileCallback) {
+      int index, Function(int) deleteFileCallback) {
     String file = filePaths.split('/').last;
     showDialog(
       context: context,
@@ -138,12 +140,13 @@ class RecallHelpers {
       builder: (BuildContext dialogContext) {
         return AlertDialog(
           // title: Text('Notification'),
-          content: Text('You have already added this File'),
+          content: const Text('You have already added this File'),
           actions: <Widget>[
             TextButton(
-              child: Text('Got it!'),
+              child: const Text('Got it!'),
               onPressed: () {
-                Navigator.of(dialogContext).pop();  // Make sure to use `dialogContext` here for clarity.
+                Navigator.of(dialogContext)
+                    .pop(); // Make sure to use `dialogContext` here for clarity.
               },
             ),
           ],
@@ -151,7 +154,6 @@ class RecallHelpers {
       },
     );
   }
-
 
   /// Displays a popup notification indicating no files have been added for generation.
   ///
@@ -168,12 +170,12 @@ class RecallHelpers {
       builder: (BuildContext dialogContext) {
         return AlertDialog(
           // title: Text('Notification'),
-          content: Text('You have not added any Files'),
+          content: const Text('You have not added any Files'),
           actions: <Widget>[
             TextButton(
-              child: Text('Got it!'),
+              child: const Text('Got it!'),
               onPressed: () {
-                Navigator.of(dialogContext).pop();  
+                Navigator.of(dialogContext).pop();
               },
             ),
           ],
@@ -181,7 +183,6 @@ class RecallHelpers {
       },
     );
   }
-
 
   /// Returns a widget with a fade-up animation for adding a file.
   ///
@@ -234,7 +235,6 @@ class RecallHelpers {
     );
   }
 
-
   /// Navigates back to the home screen.
   ///
   /// [context]: The build context to navigate.
@@ -247,20 +247,19 @@ class RecallHelpers {
     );
   }
 
-
   /// Proceeds with the selected files and shows a confirmation dialog.
   ///
   /// [selectedFiles]: The set of selected files.
   /// [context]: The build context to show the dialog.
   /// [onProceedConfirmed]: The callback function to proceed with the selected files.
   static void proceedWithSelectedFiles(
-      Set<String> selectedFiles, 
-      BuildContext context, 
-      VoidCallback onProceedConfirmed) {  // Add this callback parameter
-    _generateQuestionsConfirmation(context, selectedFiles, onProceedConfirmed); // Pass it down
+      Set<String> selectedFiles,
+      BuildContext context,
+      VoidCallback onProceedConfirmed,
+      Future<void> Function() onGenerationComplete) {
+    _generateQuestionsConfirmation(
+        context, selectedFiles, onProceedConfirmed, onGenerationComplete);
   }
-
-
 
   /// Displays a confirmation dialog for generating questions.
   ///
@@ -270,16 +269,16 @@ class RecallHelpers {
   static void _generateQuestionsConfirmation(
       BuildContext context,
       Set<String> selectedFiles,
-      VoidCallback onProceedConfirmed) {
-      Set<String> filesCopy = Set.from(selectedFiles);
+      VoidCallback onProceedConfirmed,
+      Future<void> Function() onGenerationComplete) {
+    Set<String> filesCopy = Set.from(selectedFiles);
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text("Generate Flashcards Confirmation"),
           content: Text(
-            "Do you want to generate questions from ${selectedFiles.length} files?"
-          ),
+              "Do you want to generate questions from ${selectedFiles.length} files?"),
           actions: <Widget>[
             TextButton(
               child: const Text("No"),
@@ -288,23 +287,26 @@ class RecallHelpers {
             TextButton(
               child: const Text("Yes"),
               onPressed: () async {
-
-                // First, close the dialog immediately when "Yes" is clicked.
                 Navigator.of(context).pop();
                 onProceedConfirmed();
                 await showGenerationProgressDialog(context);
-                // print("Generating questions from files: $filesCopy");
-                // Then proceed with fetching the token and generating questions.
-                var userToken = await FirebaseAuth.instance.currentUser?.getIdToken();
+                var userToken =
+                    await FirebaseAuth.instance.currentUser?.getIdToken();
                 if (userToken != null) {
-                  await RecallServices.generateQuestions(filesCopy);
-                  // print("Questions generated successfully.");
-                  
-                  
+                  bool success =
+                      await RecallServices.generateQuestions(filesCopy);
+                  if (success) {
+                    await onGenerationComplete();
+                  } else {
+                    // Handle the case where generation was not successful
+                    print("Question generation was not successful");
+                    // You might want to show an error message to the user here
+                  }
                 } else {
-                  // print("User token not found, unable to generate questions.");
+                  print("User token not found, unable to generate questions.");
+                  // You might want to show an error message to the user here
                 }
-              }
+              },
             ),
           ],
         );
@@ -326,51 +328,50 @@ class RecallHelpers {
       barrierDismissible: false,
       builder: (BuildContext context) {
         return StatefulBuilder(
-          builder: (BuildContext context, StateSetter setState) {
-            // Setup a timer to close the dialog after 2 seconds
-            Future.delayed(const Duration(seconds: 28), () {
-              if (shouldCloseDialog) {
-                Navigator.of(context, rootNavigator: true).pop();
-              }
-            });
+            builder: (BuildContext context, StateSetter setState) {
+          // Setup a timer to close the dialog after 2 seconds
+          Future.delayed(const Duration(seconds: 28), () {
+            if (shouldCloseDialog) {
+              Navigator.of(context, rootNavigator: true).pop();
+            }
+          });
 
-            return AlertDialog(
-              title: const Text("Hang Tight!"),
-              content: const Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    "Do not navigate away from this screen till your question has been generated, it is estimated to take 27 seconds. You'll get a notification when it's done.",
-                    textAlign: TextAlign.center,
-                  ),
-                  SizedBox(height: 20),
-                  CircularProgressIndicator(),
-                ],
-              ),
-              actions: <Widget>[
-                TextButton(
-                  child: const Text("Got it!"),
-                  onPressed: () {
-                    shouldCloseDialog = false; // Prevent automatic closure if manually dismissed
-                    Navigator.of(context).pop();
-                  },
+          return AlertDialog(
+            title: const Text("Hang Tight!"),
+            content: const Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  "Do not navigate away from this screen till your question has been generated, it is estimated to take 27 seconds. You'll get a notification when it's done.",
+                  textAlign: TextAlign.center,
                 ),
+                SizedBox(height: 20),
+                CircularProgressIndicator(),
               ],
-            );
-          }
-        );
+            ),
+            actions: <Widget>[
+              TextButton(
+                child: const Text("Got it!"),
+                onPressed: () {
+                  shouldCloseDialog =
+                      false; // Prevent automatic closure if manually dismissed
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        });
       },
     );
   }
-
-
 
   /// Generates questions from the selected files.
   ///
   /// [selectedFiles]: The set of selected files.
   /// [onCompleted]: The callback function to call when generation is completed.
   /// [context]: The build context.
-  static void generateQuestions(Set<String> selectedFiles, VoidCallback onCompleted, BuildContext context) {
+  static void generateQuestions(Set<String> selectedFiles,
+      VoidCallback onCompleted, BuildContext context) {
     RecallServices.generateQuestions(selectedFiles).then((_) {
       // All files uploaded successfully
       // print("All files uploaded successfully");
@@ -380,7 +381,6 @@ class RecallHelpers {
       // print('Error uploading files: $error');
     });
   }
-
 
   // static void DeleteAllConfirmation(BuildContext context,
   //     List<String> filePaths, VoidCallback deleteAllCallback) {

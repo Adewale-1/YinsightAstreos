@@ -11,7 +11,7 @@ import 'package:yinsight/Screens/Focus/utils/task_utils.dart';
 import 'package:yinsight/Screens/Focus/widgets/task_timer.dart';
 
 class focusSection extends StatefulWidget {
-  const focusSection({Key? key}) : super(key: key);
+  const focusSection({super.key});
 
   @override
   State<focusSection> createState() => focusSectionState();

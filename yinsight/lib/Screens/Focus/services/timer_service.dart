@@ -64,7 +64,9 @@ class TimerService {
 
   /// Stops all timers.
   void stopAllTimers() {
-    _timers.values.forEach((timer) => timer.cancel());
+    for (var timer in _timers.values) {
+      timer.cancel();
+    }
     _timers.clear();
   }
 

@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:yinsight/Screens/Focus/views/focus.dart';
 import 'package:yinsight/Screens/HomePage/views/home/home_screen.dart';
-import 'package:yinsight/Screens/HomePage/widgets/settings.dart';
 import 'package:yinsight/Screens/Recall/views/recall_screen.dart';
 import 'package:yinsight/Screens/Reflection/CardScreen.dart';
-import 'package:yinsight/Screens/Streaks/FlipCard.dart';
 import 'package:yinsight/Screens/Streaks/StreaksPage.dart';
 
 /// The main navigation screen of the application.
@@ -38,8 +36,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     const Recall(),
     const CardScreen(),
     // const SettingsScreen(),
-    StreaksPage(),
-
+    const StreaksPage(),
   ];
 
   void _navigateToSection(int index) {

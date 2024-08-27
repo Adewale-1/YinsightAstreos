@@ -1,10 +1,5 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:http/http.dart' as http;
-import 'package:yinsight/Globals/services/userInfo.dart';
-import 'package:yinsight/Screens/HomePage/widgets/Calender/eventsCalender.dart';
 import 'package:yinsight/Screens/Login_Signup/services/user_Authentication.dart';
 
 /// A screen for displaying the Google Calendar.
@@ -96,7 +91,7 @@ class _CalendarDisplayScreenState extends State<CalendarDisplayScreen> {
                 color: Colors.black,
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
             Center(child: squareTile()),

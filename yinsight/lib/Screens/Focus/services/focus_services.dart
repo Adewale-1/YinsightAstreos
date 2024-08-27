@@ -51,8 +51,9 @@ class FocusService {
     // print('${UserInformation.getRoute('getTotalTimeSpentForTask')}?task_id=$taskId');
     // print(response.statusCode);
 
-    if (response.statusCode != 200)
+    if (response.statusCode != 200) {
       throw Exception('Failed to fetch total time spent');
+    }
     return jsonDecode(response.body)['total_time_spent'] ?? "00:00:00";
   }
 
@@ -70,7 +71,8 @@ class FocusService {
       body: jsonEncode({'task_id': taskId, 'total_time_spent': totalTimeSpent}),
     );
 
-    if (response.statusCode != 200)
+    if (response.statusCode != 200) {
       throw Exception('Failed to update total time spent');
+    }
   }
 }

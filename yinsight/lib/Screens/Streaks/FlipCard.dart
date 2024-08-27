@@ -1,7 +1,6 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'dart:math';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
@@ -9,6 +8,8 @@ import 'package:screenshot/screenshot.dart';
 import 'package:share_plus/share_plus.dart';
 
 class FlipCardScreen extends StatefulWidget {
+  const FlipCardScreen({super.key});
+
   @override
   _FlipCardScreenState createState() => _FlipCardScreenState();
 }
@@ -154,7 +155,7 @@ class _FlipCardScreenState extends State<FlipCardScreen>
                                     color: Colors.grey.withOpacity(1.0),
                                     spreadRadius: 5,
                                     blurRadius: 7,
-                                    offset: Offset(0, 3),
+                                    offset: const Offset(0, 3),
                                   ),
                                 ],
                               ),
@@ -175,9 +176,9 @@ class _FlipCardScreenState extends State<FlipCardScreen>
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue,
                   foregroundColor: Colors.white,
-                  padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                 ),
-                child: Text('Share Card', style: TextStyle(fontSize: 18)),
+                child: const Text('Share Card', style: TextStyle(fontSize: 18)),
               ),
             ),
           ],

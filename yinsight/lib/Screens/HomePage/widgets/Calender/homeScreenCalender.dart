@@ -52,6 +52,7 @@ class _CalendarSectionState extends ConsumerState<CalendarSection> {
         date1.month == date2.month &&
         date1.day == date2.day;
   }
+
   /// Builds a widget to display tasks for a specific hour in the calendar.
   ///
   /// [isHighlighted]: Whether the time slot is highlighted.

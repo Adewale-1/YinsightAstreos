@@ -1,36 +1,26 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:yinsight/Globals/services/userInfo.dart';
 import 'package:yinsight/Screens/HomePage/services/navigation_service.dart';
 
 class StreaksPage extends StatefulWidget {
+  const StreaksPage({super.key});
+
   @override
   _StreaksPageState createState() => _StreaksPageState();
 }
 
 class _StreaksPageState extends State<StreaksPage> {
-  // Example data - replace this with your backend data
-  Map<DateTime, int> heatmapData = {
-    DateTime(2024, 2, 1): 5,
-    DateTime(2024, 2, 2): 2,
-    DateTime(2024, 2, 3): 8,
-    DateTime(2024, 2, 5): 10,
-    DateTime(2024, 8, 1): 5,
-    DateTime(2024, 8, 2): 2,
-    DateTime(2024, 8, 3): 8,
-    DateTime(2024, 8, 5): 10,
-    DateTime(2024, 8, 18): 10,
-    DateTime(2024, 8, 7): 5,
-    DateTime(2024, 8, 8): 2,
-    DateTime(2024, 8, 11): 8,
-    DateTime(2024, 8, 31): 10,
-    // Add more data points as needed
-  };
+  Map<DateTime, int> heatmapData = {};
 
-  DateTime now = DateTime(2024, 2, 1);
+  // DateTime now = DateTime(2024, 2, 1);
 
   // Controller for the PageView
-  PageController _pageController;
+  final PageController _pageController;
   int _currentPageIndex;
 
   _StreaksPageState()
@@ -38,12 +28,43 @@ class _StreaksPageState extends State<StreaksPage> {
             DateTime.now().month - 1, // Start with the current month
         _pageController = PageController(initialPage: DateTime.now().month - 1);
 
+  @override
+  void initState() {
+    super.initState();
+    _getStreaksMap(); // Fetch streaks data when the page is initialized
+  }
+
+  Future<void> _getStreaksMap() async {
+    final user = FirebaseAuth.instance.currentUser;
+    String? token = await user?.getIdToken();
+    if (token == null) throw Exception('No token found');
+
+    var response = await http.get(
+      Uri.parse(UserInformation.getRoute('entireStreaks')),
+      headers: {'Authorization': token},
+    );
+
+    if (response.statusCode != 200) throw Exception('Failed to load tasks');
+
+    var data = jsonDecode(response.body);
+    if (data['message'] != 'Successfully retrieved points for the calendar.') {
+      throw Exception('Unexpected response message');
+    }
+
+    Map<String, dynamic> calendarPoints = data['calendar_points'];
+    setState(() {
+      heatmapData = calendarPoints.map((dateString, value) {
+        DateTime date = DateTime.parse(dateString);
+        return MapEntry(date, value.toInt());
+      });
+    });
+  }
+
   Color getHeatmapColor(int value) {
     if (value == 0) return Colors.grey.withOpacity(0.5); // No data
     if (value <= 2) return Colors.green[100]!;
     if (value <= 5) return Colors.green[300]!;
-    if (value <= 8) return Colors.green[500]!;
-    print({now});
+    if (value <= 8) return Colors.green[800]!;
     return Colors.green[700]!;
   }
 
@@ -172,7 +193,7 @@ class _StreaksPageState extends State<StreaksPage> {
                                     color: getHeatmapColor(value),
                                     borderRadius: BorderRadius.circular(8),
                                   ),
-                                  child: Center(
+                                  child: const Center(
                                       // child: Text(
                                       //   dayNumber.toString(),
                                       //   style: const TextStyle(

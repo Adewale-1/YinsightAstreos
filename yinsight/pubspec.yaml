@@ -74,6 +74,7 @@ dependencies:
   share_plus: ^10.0.0
   screenshot: ^3.0.0
   flutter_heatmap_calendar: ^1.0.5
+  flutter_card_swiper: ^7.0.1
   
 dev_dependencies:
   flutter_test:

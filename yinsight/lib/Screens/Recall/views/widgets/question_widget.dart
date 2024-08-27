@@ -1,15 +1,15 @@
-import 'package:flutter/material.dart';
+// import 'package:flutter/material.dart';
 
-class QuestionWidget extends StatelessWidget {
-  final String questionText;
+// class QuestionWidget extends StatelessWidget {
+//   final String questionText;
 
-  const QuestionWidget({super.key, required this.questionText});
+//   const QuestionWidget({super.key, required this.questionText});
 
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Text(questionText),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return Padding(
+//       padding: const EdgeInsets.all(16),
+//       child: Text(questionText),
+//     );
+//   }
+// }

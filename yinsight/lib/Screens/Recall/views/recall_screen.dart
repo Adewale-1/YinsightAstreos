@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'package:flutter/widgets.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -39,7 +38,6 @@ class _RecallState extends State<Recall> with TickerProviderStateMixin {
   OverlayEntry? _overlayEntry;
   String activity1 = "fileUpload";
   String activity2 = "flashcardGeneration";
-  String activity3 = "showQuestion";
 
   final bool _isDialogShown = false;
 
@@ -126,6 +124,10 @@ class _RecallState extends State<Recall> with TickerProviderStateMixin {
       backgroundColor: Colors.white,
       child: const Icon(Icons.chevron_left, size: 40, color: Colors.black),
     );
+  }
+
+  Future<void> _onGenerationComplete() async {
+    await _checkAndUpdatePoints(activity2);
   }
 
   /// Deletes a file at the specified index.
@@ -366,7 +368,7 @@ class _RecallState extends State<Recall> with TickerProviderStateMixin {
       var response = await request.send();
       if (response.statusCode == 200) {
         await _fetchUploadedFiles(); // Fetch the updated list of uploaded files
-        await _checkAndUpdatePoints();
+        await _checkAndUpdatePoints(activity1);
       } else {
         throw Exception('Failed to upload file');
       }
@@ -375,7 +377,7 @@ class _RecallState extends State<Recall> with TickerProviderStateMixin {
     }
   }
 
-  Future<void> _checkAndUpdatePoints() async {
+  Future<void> _checkAndUpdatePoints(String activity) async {
     try {
       final user = FirebaseAuth.instance.currentUser;
       String? token = await user?.getIdToken();
@@ -385,21 +387,14 @@ class _RecallState extends State<Recall> with TickerProviderStateMixin {
       }
 
       final url =
-          '${UserInformation.getRoute('checkForPoints')}/?activity=$activity1';
-      // print('Attempting to call URL: $url');
-      // print('Token: $token'); // Print token for debugging
-
+          '${UserInformation.getRoute('checkForPoints')}/?activity=$activity';
       final httpClient = HttpClient();
       try {
         final request = await httpClient.getUrl(Uri.parse(url));
         request.headers.set('Authorization', token);
-        // print('Request headers: ${request.headers}'); // Print request headers
 
         final response = await request.close();
-        // print("Response Status: ${response.statusCode}");
-
         final responseBody = await response.transform(utf8.decoder).join();
-        // print("Response Body: $responseBody");
 
         if (response.statusCode == 200) {
           final data = json.decode(responseBody);
@@ -413,15 +408,27 @@ class _RecallState extends State<Recall> with TickerProviderStateMixin {
             print("Current date is $currentDate");
             print(
                 "Difference is : ${currentDate.difference(lastOpenedDate).inDays}");
-            if (currentDate.difference(lastOpenedDate).inDays == 0 &&
-                pointsEarned == 1.0) {
-              print('Points already allocated today, not showing animation');
-              return;
+
+            // Check points based on activity
+            if (activity == "fileUpload") {
+              if (currentDate.difference(lastOpenedDate).inDays == 0 &&
+                  pointsEarned == 1.0) {
+                print(
+                    'Points already allocated today for file upload, not showing animation');
+                return;
+              }
+            } else if (activity == "flashcardGeneration") {
+              if (currentDate.difference(lastOpenedDate).inDays == 0 &&
+                  pointsEarned == 1.5) {
+                print(
+                    'Points already allocated today for flashcard generation, not showing animation');
+                return;
+              }
             }
           }
 
           print('Updating daily activity and showing animation');
-          await _updateDailyActivityAndStreak();
+          await _updateDailyActivityAndStreak(activity);
           _showTransitionGif();
         } else {
           print('Failed to check points: ${response.statusCode}');
@@ -436,7 +443,7 @@ class _RecallState extends State<Recall> with TickerProviderStateMixin {
     }
   }
 
-  Future<void> _updateDailyActivityAndStreak() async {
+  Future<void> _updateDailyActivityAndStreak(String activity) async {
     final user = FirebaseAuth.instance.currentUser;
     String? token = await user?.getIdToken();
 
@@ -450,7 +457,7 @@ class _RecallState extends State<Recall> with TickerProviderStateMixin {
           .postUrl(Uri.parse(UserInformation.getRoute('allocatePoints')));
       request.headers.set(HttpHeaders.contentTypeHeader, 'application/json');
       request.headers.set(HttpHeaders.authorizationHeader, token);
-      request.add(utf8.encode(json.encode({'activity': activity1})));
+      request.add(utf8.encode(json.encode({'activity': activity})));
 
       final response = await request.close();
 
@@ -542,8 +549,8 @@ class _RecallState extends State<Recall> with TickerProviderStateMixin {
               TextButton(
                 onPressed: () {
                   // Implement the logic for Proceed
-                  RecallHelpers.proceedWithSelectedFiles(
-                      selectedFiles, context, _resetState);
+                  RecallHelpers.proceedWithSelectedFiles(selectedFiles, context,
+                      _resetState, _onGenerationComplete);
                 },
                 child: Text(
                   "Proceed",

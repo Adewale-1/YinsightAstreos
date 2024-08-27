@@ -43,7 +43,7 @@ class NavigationService {
   static void navigateToBadge(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => FlipCardScreen()),
+      MaterialPageRoute(builder: (context) => const FlipCardScreen()),
     );
   }
 }
