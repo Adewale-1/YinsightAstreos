@@ -283,11 +283,6 @@ class _TaskSectionState extends ConsumerState<TaskSection> {
 
                             refreshTasks();
 
-                            //   refreshTasks();
-                            // }
-
-                            refreshTasks();
-
                             print("reached here");
                             for (int i = 0; i < tasks.length; i++) {
                               print(tasks[i].name);
