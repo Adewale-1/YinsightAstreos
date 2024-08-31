@@ -249,25 +249,9 @@ class _TaskSectionState extends ConsumerState<TaskSection> {
                           onDragStarted: () {
 
                             ref.read(tasksProvider.notifier).startDraggingTask(task);
-                            //refreshTasks();
-
-                              // setState(() {
-                              //   tasks.remove(task);
-                              // });
-
-                            for (int i = 0; i < tasks.length; i++) {
-                              print(tasks[i].name);
-                            }
-                            print("");
                           },
                           onDraggableCanceled: (velocity, offset) {
                             ref.read(tasksProvider.notifier).cancelDraggingTask(task);
-                            refreshTasks();
-
-                            for (int i = 0; i < tasks.length; i++) {
-                              print(tasks[i].name);
-                            }
-                            print("");
                           },
 
                           onDragEnd: (details) {
@@ -281,13 +265,13 @@ class _TaskSectionState extends ConsumerState<TaskSection> {
                               });
                             }
 
-                            refreshTasks();
+                            //refreshTasks();
 
-                            print("reached here");
-                            for (int i = 0; i < tasks.length; i++) {
-                              print(tasks[i].name);
-                            }
-                            print("");
+                            // print("reached here");
+                            // for (int i = 0; i < tasks.length; i++) {
+                            //   print(tasks[i].name);
+                            // }
+                            // print("");
 
                           },
 

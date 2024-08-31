@@ -102,44 +102,44 @@ class _StreaksPageState extends State<StreaksPage> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  decoration: BoxDecoration(
-                    color: Colors.blue, // Blue background color
-                    borderRadius: BorderRadius.circular(10), // Rounded corners
-                    border: Border.all(
-                      color: Colors.blue, // Border color
-                    ),
-                  ),
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton<int>(
-                      value: _selectedYear,
-                      items: _years.map((int year) {
-                        return DropdownMenuItem<int>(
-                          value: year,
-                          child: Text(
-                            year.toString(),
-                            style: GoogleFonts.lexend(
-                              color: Colors.white, // White text color
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                      onChanged: (int? newYear) {
-                        setState(() {
-                          _selectedYear = newYear!;
-                        });
-                      },
-                      dropdownColor: Colors.blue, // Background color of the dropdown
-                      icon: const Icon(
-                        Icons.arrow_drop_down, // Dropdown arrow icon
-                        color: Colors.white, // Arrow color
-                      ),
-                    ),
-                  ),
-                ),
+                // Container(
+                //   padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                //   decoration: BoxDecoration(
+                //     color: Colors.blue, // Blue background color
+                //     borderRadius: BorderRadius.circular(10), // Rounded corners
+                //     border: Border.all(
+                //       color: Colors.blue, // Border color
+                //     ),
+                //   ),
+                //   child: DropdownButtonHideUnderline(
+                //     child: DropdownButton<int>(
+                //       value: _selectedYear,
+                //       items: _years.map((int year) {
+                //         return DropdownMenuItem<int>(
+                //           value: year,
+                //           child: Text(
+                //             year.toString(),
+                //             style: GoogleFonts.lexend(
+                //               color: Colors.white, // White text color
+                //             ),
+                //           ),
+                //         );
+                //       }).toList(),
+                //       onChanged: (int? newYear) {
+                //         setState(() {
+                //           _selectedYear = newYear!;
+                //         });
+                //       },
+                //       dropdownColor: Colors.blue, // Background color of the dropdown
+                //       icon: const Icon(
+                //         Icons.arrow_drop_down, // Dropdown arrow icon
+                //         color: Colors.white, // Arrow color
+                //       ),
+                //     ),
+                //   ),
+                // ),
 
                   TextButton(
                     onPressed: () {
@@ -175,56 +175,56 @@ class _StreaksPageState extends State<StreaksPage> {
                 ],
               ),
               const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  RichText(
-                    text: TextSpan(
-                      text: "Total Active Days: ",
-                      style: GoogleFonts.lexend(
-                        color: Colors.black54, // Normal text color
-                        fontSize: 16.0, // Normal font size
-                      ),
-                      children: [
-                        TextSpan(
-                          text: "${getTotalActiveDays()}",
-                          style: GoogleFonts.lexend(
-                            color: Colors.black, // Bold value color
-                            fontSize: 20.0, // Larger font size for the value
-                            fontWeight: FontWeight.bold, // Bold font weight
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  RichText(
-                    text: TextSpan(
-                      text: "Max Streak: ",
-                      style: GoogleFonts.lexend(
-                        color: Colors.black54, // Normal text color
-                        fontSize: 16.0, // Normal font size
-                      ),
-                      children: [
-                        TextSpan(
-                          text: "${getMaxStreak()}",
-                          style: GoogleFonts.lexend(
-                            color: Colors.black, // Bold value color
-                            fontSize: 20.0, // Larger font size for the value
-                            fontWeight: FontWeight.bold, // Bold font weight
-                          ),
-                        ),
-                        TextSpan(
-                          text: " days",
-                          style: GoogleFonts.lexend(
-                            color: Colors.black54, // Normal text color
-                            fontSize: 16.0, // Normal font size
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+              // Row(
+              //   mainAxisAlignment: MainAxisAlignment.spaceAround,
+              //   children: [
+              //     RichText(
+              //       text: TextSpan(
+              //         text: "Total Active Days: ",
+              //         style: GoogleFonts.lexend(
+              //           color: Colors.black54, // Normal text color
+              //           fontSize: 16.0, // Normal font size
+              //         ),
+              //         children: [
+              //           TextSpan(
+              //             text: "${getTotalActiveDays()}",
+              //             style: GoogleFonts.lexend(
+              //               color: Colors.black, // Bold value color
+              //               fontSize: 20.0, // Larger font size for the value
+              //               fontWeight: FontWeight.bold, // Bold font weight
+              //             ),
+              //           ),
+              //         ],
+              //       ),
+              //     ),
+              //     RichText(
+              //       text: TextSpan(
+              //         text: "Max Streak: ",
+              //         style: GoogleFonts.lexend(
+              //           color: Colors.black54, // Normal text color
+              //           fontSize: 16.0, // Normal font size
+              //         ),
+              //         children: [
+              //           TextSpan(
+              //             text: "${getMaxStreak()}",
+              //             style: GoogleFonts.lexend(
+              //               color: Colors.black, // Bold value color
+              //               fontSize: 20.0, // Larger font size for the value
+              //               fontWeight: FontWeight.bold, // Bold font weight
+              //             ),
+              //           ),
+              //           TextSpan(
+              //             text: " days",
+              //             style: GoogleFonts.lexend(
+              //               color: Colors.black54, // Normal text color
+              //               fontSize: 16.0, // Normal font size
+              //             ),
+              //           ),
+              //         ],
+              //       ),
+              //     ),
+              //   ],
+              // ),
               const SizedBox(height: 20),
               Container(
                 height: 400,
@@ -304,23 +304,23 @@ class _StreaksPageState extends State<StreaksPage> {
                                     color: getHeatmapColor(value),
                                     borderRadius: BorderRadius.circular(8),
                                   ),
-                                  child: Stack(
-                                    children: [
-                                      Positioned(
-                                        bottom: 4,
-                                        left: 4,
-                                        child: Text(
-                                          dayNumber.toString(),
-                                          style: const TextStyle(
-                                            color: Colors.black54,
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                      // Other content can be added here if needed
-                                    ],
-                                  ),
+                                  // child: Stack(
+                                  //   children: [
+                                  //     Positioned(
+                                  //       bottom: 4,
+                                  //       left: 4,
+                                  //       child: Text(
+                                  //         dayNumber.toString(),
+                                  //         style: const TextStyle(
+                                  //           color: Colors.black54,
+                                  //           fontSize: 12,
+                                  //           fontWeight: FontWeight.bold,
+                                  //         ),
+                                  //       ),
+                                  //     ),
+                                  //     // Other content can be added here if needed
+                                  //   ],
+                                  // ),
                                   // child: Center(
                                   //     // child: Text(
                                   //     //   dayNumber.toString(),
@@ -340,73 +340,73 @@ class _StreaksPageState extends State<StreaksPage> {
                   },
                 ),
               ),
-              const SizedBox(height: 20),
-              Container(
-                height: 200,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(15),
-                  color: Colors.white,
-                  border: Border.all(width: 1, color: Colors.black12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.5),
-                      spreadRadius: 2,
-                      blurRadius: 4,
-                      offset: const Offset(0, 3),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Text(
-                        "Community Stats",
-                        style: GoogleFonts.lexend(
-                          textStyle: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                    const Divider(height: 1, thickness: 1, color: Colors.black),
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            _buildStatsRow(
-                                "Invite friends",
-                                Icons.people_outline,
-                                Colors.blue,
-                                "10 points"), // Placeholder value
-                            _buildStatsRow(
-                                "Review other users",
-                                Icons.star_border,
-                                Colors.orange,
-                                "5 points"), // Placeholder value
-                            _buildStatsRow(
-                                "Complete tasks",
-                                Icons.check_circle_outline,
-                                Colors.green,
-                                "15 points"), // Placeholder value
-                            _buildStatsRow(
-                                "Share progress",
-                                Icons.share,
-                                Colors.purple,
-                                "20 points"), // Placeholder value
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              // const SizedBox(height: 20),
+              // Container(
+              //   height: 200,
+              //   decoration: BoxDecoration(
+              //     borderRadius: BorderRadius.circular(15),
+              //     color: Colors.white,
+              //     border: Border.all(width: 1, color: Colors.black12),
+              //     boxShadow: [
+              //       BoxShadow(
+              //         color: Colors.grey.withOpacity(0.5),
+              //         spreadRadius: 2,
+              //         blurRadius: 4,
+              //         offset: const Offset(0, 3),
+              //       ),
+              //     ],
+              //   ),
+              //   child: Column(
+              //     crossAxisAlignment: CrossAxisAlignment.stretch,
+              //     children: [
+              //       Padding(
+              //         padding: const EdgeInsets.all(16.0),
+              //         child: Text(
+              //           "Community Stats",
+              //           style: GoogleFonts.lexend(
+              //             textStyle: const TextStyle(
+              //               fontSize: 20,
+              //               fontWeight: FontWeight.bold,
+              //               color: Colors.black,
+              //             ),
+              //           ),
+              //           textAlign: TextAlign.center,
+              //         ),
+              //       ),
+              //       const Divider(height: 1, thickness: 1, color: Colors.black),
+              //       Expanded(
+              //         child: Padding(
+              //           padding: const EdgeInsets.all(16.0),
+              //           child: Column(
+              //             mainAxisAlignment: MainAxisAlignment.spaceAround,
+              //             children: [
+              //               _buildStatsRow(
+              //                   "Invite friends",
+              //                   Icons.people_outline,
+              //                   Colors.blue,
+              //                   "10 points"), // Placeholder value
+              //               _buildStatsRow(
+              //                   "Review other users",
+              //                   Icons.star_border,
+              //                   Colors.orange,
+              //                   "5 points"), // Placeholder value
+              //               _buildStatsRow(
+              //                   "Complete tasks",
+              //                   Icons.check_circle_outline,
+              //                   Colors.green,
+              //                   "15 points"), // Placeholder value
+              //               _buildStatsRow(
+              //                   "Share progress",
+              //                   Icons.share,
+              //                   Colors.purple,
+              //                   "20 points"), // Placeholder value
+              //             ],
+              //           ),
+              //         ),
+              //       ),
+              //     ],
+              //   ),
+              // ),
             ],
           ),
         ),
@@ -414,36 +414,36 @@ class _StreaksPageState extends State<StreaksPage> {
     );
   }
 
-  Widget _buildStatsRow(
-      String label, IconData icon, Color color, String value) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Row(
-          children: [
-            Icon(
-              icon,
-              color: color,
-            ),
-            const SizedBox(width: 8),
-            Text(
-              label,
-              style: GoogleFonts.lexend(
-                color: Colors.black,
-                fontSize: 16.0,
-              ),
-            ),
-          ],
-        ),
-        Text(
-          value,
-          style: GoogleFonts.lexend(
-            color: Colors.black,
-            fontWeight: FontWeight.bold,
-            fontSize: 16.0,
-          ),
-        ),
-      ],
-    );
-  }
+  // Widget _buildStatsRow(
+  //     String label, IconData icon, Color color, String value) {
+  //   return Row(
+  //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //     children: [
+  //       Row(
+  //         children: [
+  //           Icon(
+  //             icon,
+  //             color: color,
+  //           ),
+  //           const SizedBox(width: 8),
+  //           Text(
+  //             label,
+  //             style: GoogleFonts.lexend(
+  //               color: Colors.black,
+  //               fontSize: 16.0,
+  //             ),
+  //           ),
+  //         ],
+  //       ),
+  //       Text(
+  //         value,
+  //         style: GoogleFonts.lexend(
+  //           color: Colors.black,
+  //           fontWeight: FontWeight.bold,
+  //           fontSize: 16.0,
+  //         ),
+  //       ),
+  //     ],
+  //   );
+  // }
 }
