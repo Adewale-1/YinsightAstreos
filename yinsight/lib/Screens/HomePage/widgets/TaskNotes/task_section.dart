@@ -23,9 +23,9 @@ class TaskSection extends ConsumerStatefulWidget {
 class _TaskSectionState extends ConsumerState<TaskSection> {
   late Future<List<Task>> _tasksFuture;
 
-void _onTaskDropped(DateTime date) {
-  refreshTasks();
-}
+  void _onTaskDropped(DateTime date) {
+    refreshTasks();
+  }
 
   @override
   void initState() {
@@ -174,14 +174,14 @@ void _onTaskDropped(DateTime date) {
                     return Text("Error: ${snapshot.error}");
                   } else if (snapshot.hasData) {
                     List<Task> tasks = snapshot.data!;
-                    tasks.sort((a, b) => _priorityValue(b.priority).compareTo(_priorityValue(a.priority)));
+                    //tasks.sort((a, b) => _priorityValue(b.priority).compareTo(_priorityValue(a.priority)));
                     return ListView.builder(
                       itemCount: tasks.length,
                       itemBuilder: (context, index) {
                         final task = tasks[index];
                         final priorityString = priorityToString(task.priority);
                         final color = _colorForPriority(task.priority);
-                        return LongPressDraggable<Task>(
+                        return Draggable<Task>(
                           data: task,
                           feedback: Material(
                             elevation: 4.0,
@@ -245,13 +245,34 @@ void _onTaskDropped(DateTime date) {
                           ),
 
                           onDragStarted: () {
+
                             ref.read(tasksProvider.notifier).startDraggingTask(task);
-                            refreshTasks();
                           },
                           onDraggableCanceled: (velocity, offset) {
                             ref.read(tasksProvider.notifier).cancelDraggingTask(task);
-                            refreshTasks();
                           },
+
+                          onDragEnd: (details) {
+                            // print("-" + task.name);
+                            // print(details.wasAccepted);
+                            if (details.wasAccepted) {
+                              setState(() {
+                                ref.read(tasksProvider.notifier).refreshTasks();
+
+                                tasks.remove(task);
+                              });
+                            }
+
+                            //refreshTasks();
+
+                            // print("reached here");
+                            // for (int i = 0; i < tasks.length; i++) {
+                            //   print(tasks[i].name);
+                            // }
+                            // print("");
+
+                          },
+
                           child: Container(
                             margin: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
                             decoration: BoxDecoration(
