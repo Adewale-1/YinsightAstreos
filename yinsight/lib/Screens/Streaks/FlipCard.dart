@@ -6,6 +6,7 @@ import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:intl/intl.dart';
 
 class FlipCardScreen extends StatefulWidget {
   const FlipCardScreen({super.key});
@@ -73,74 +74,228 @@ class _FlipCardScreenState extends State<FlipCardScreen>
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: Center(
-                child: Screenshot(
-                  controller: screenshotController,
-                  child: GestureDetector(
-                    onHorizontalDragStart: (details) {
-                      _dragStartX = details.globalPosition.dx;
-                    },
-                    onHorizontalDragUpdate: (details) {
-                      _dragEndX = details.globalPosition.dx;
-                      double dragDistance = (_dragEndX - _dragStartX) /
-                          MediaQuery.of(context).size.width;
+  // @override
+  // Widget build(BuildContext context) {
+  //   return Scaffold(
+  //     appBar: AppBar(
+  //       leading: IconButton(
+  //         icon: const Icon(Icons.arrow_back),
+  //         onPressed: () {
+  //           Navigator.pop(context);
+  //         },
+  //       ),
+  //     ),
+  //     body: SafeArea(
+  //       child: Column(
+  //         children: [
+  //           Expanded(
+  //             child: Center(
+  //               child: Screenshot(
+  //                 controller: screenshotController,
+  //                 child: GestureDetector(
+  //                   onHorizontalDragStart: (details) {
+  //                     _dragStartX = details.globalPosition.dx;
+  //                   },
+  //                   onHorizontalDragUpdate: (details) {
+  //                     _dragEndX = details.globalPosition.dx;
+  //                     double dragDistance = (_dragEndX - _dragStartX) /
+  //                         MediaQuery.of(context).size.width;
 
-                      setState(() {
-                        if (_isFront) {
-                          _controller.value = dragDistance.abs() > 0.5
-                              ? 0.5
-                              : dragDistance.abs();
-                        } else {
-                          _controller.value = 1 -
-                              (dragDistance.abs() > 0.5
-                                  ? 0.5
-                                  : dragDistance.abs());
-                        }
-                      });
-                    },
-                    onHorizontalDragEnd: (details) {
-                      if ((_dragEndX - _dragStartX).abs() >
-                          MediaQuery.of(context).size.width / 4) {
-                        _toggleCard();
+  //                     setState(() {
+  //                       if (_isFront) {
+  //                         _controller.value = dragDistance.abs() > 0.5
+  //                             ? 0.5
+  //                             : dragDistance.abs();
+  //                       } else {
+  //                         _controller.value = 1 -
+  //                             (dragDistance.abs() > 0.5
+  //                                 ? 0.5
+  //                                 : dragDistance.abs());
+  //                       }
+  //                     });
+  //                   },
+  //                   onHorizontalDragEnd: (details) {
+  //                     if ((_dragEndX - _dragStartX).abs() >
+  //                         MediaQuery.of(context).size.width / 4) {
+  //                       _toggleCard();
+  //                     } else {
+  //                       if (_isFront) {
+  //                         _controller.reverse();
+  //                       } else {
+  //                         _controller.forward();
+  //                       }
+  //                     }
+  //                   },
+  //                   child: Stack(
+  //                     alignment: Alignment.center,
+  //                     children: [
+  //                       // // Back of the card (black with image)
+  //                       // Transform(
+  //                       //   alignment: Alignment.center,
+  //                       //   transform: Matrix4.identity()
+  //                       //     ..rotateY(pi * _animation.value),
+  //                       //   child: Container(
+  //                       //     width: 300,
+  //                       //     height: 400,
+  //                       //     decoration: BoxDecoration(
+  //                       //       image: DecorationImage(
+  //                       //         image: AssetImage('lib/Assets/Image_Comp/FlipCardImages/newbie.png'), // Your image path
+  //                       //         fit: BoxFit.cover,
+  //                       //       ),
+  //                       //     ),
+  //                       //   ),
+  //                       // ),
+  //                       // Back of the card (black with image)
+  //                       Transform(
+  //                         alignment: Alignment.center,
+  //                         transform: Matrix4.identity()
+  //                           ..rotateY(pi * (0.5)),
+  //                         child: ClipPath(
+  //                           clipper: CardClipper(),
+  //                           child: Container(
+  //                             width: 320,
+  //                             height: 430,
+  //                             decoration: BoxDecoration(
+  //                               image: DecorationImage(
+  //                                 image: AssetImage(
+  //                                     'lib/Assets/Image_Comp/FlipCardImages/newbie.png'), // Replace with actual image path
+  //                                 fit: BoxFit.cover,
+  //                               ),
+  //                             ),
+  //                           ),
+  //                         ),
+  //                       ),
+  //                       // Front of the card (custom shape)
+  //                       Transform(
+  //                         alignment: Alignment.center,
+  //                         transform: Matrix4.identity()
+  //                           ..rotateY(pi * (1 - _animation.value)),
+  //                         child: ClipPath(
+  //                           clipper: CardClipper(),
+  //                           child: Container(
+  //                             width: 320,
+  //                             height: 430,
+  //                             decoration: BoxDecoration(
+  //                               color: Colors.white,
+  //                               borderRadius: const BorderRadius.only(
+  //                                 topRight: Radius.circular(20),
+  //                                 bottomLeft: Radius.circular(20),
+  //                               ),
+  //                               boxShadow: [
+  //                                 BoxShadow(
+  //                                   color: Colors.grey.withOpacity(1.0),
+  //                                   spreadRadius: 5,
+  //                                   blurRadius: 7,
+  //                                   offset: const Offset(0, 3),
+  //                                 ),
+  //                               ],
+  //                             ),
+  //                             child: _buildCardContent(),
+  //                           ),
+  //                         ),
+  //                       ),
+  //                     ],
+  //                   ),
+  //                 ),
+  //               ),
+  //             ),
+  //           ),
+  //           Padding(
+  //             padding: const EdgeInsets.all(16.0),
+  //             child: ElevatedButton(
+  //               onPressed: _captureAndSharePng,
+  //               style: ElevatedButton.styleFrom(
+  //                 backgroundColor: Colors.blue,
+  //                 foregroundColor: Colors.white,
+  //                 padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+  //               ),
+  //               child: const Text('Share Card', style: TextStyle(fontSize: 18)),
+  //             ),
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
+
+@override
+Widget build(BuildContext context) {
+  return Scaffold(
+    appBar: AppBar(
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back),
+        onPressed: () {
+          Navigator.pop(context);
+        },
+      ),
+    ),
+    body: SafeArea(
+      child: Column(
+        children: [
+          Expanded(
+            child: Center(
+              child: Screenshot(
+                controller: screenshotController,
+                child: GestureDetector(
+                  onHorizontalDragStart: (details) {
+                    _dragStartX = details.globalPosition.dx;
+                  },
+                  onHorizontalDragUpdate: (details) {
+                    _dragEndX = details.globalPosition.dx;
+                    double dragDistance = (_dragEndX - _dragStartX) / MediaQuery.of(context).size.width;
+
+                    setState(() {
+                      if (_isFront) {
+                        _controller.value = 1 - dragDistance.abs().clamp(0.0, 1.0);
                       } else {
-                        if (_isFront) {
-                          _controller.reverse();
-                        } else {
-                          _controller.forward();
-                        }
+                        _controller.value = dragDistance.abs().clamp(0.0, 1.0);
                       }
-                    },
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        // Back of the card (black)
-                        Transform(
-                          alignment: Alignment.center,
-                          transform: Matrix4.identity()
-                            ..rotateY(pi * _animation.value),
-                          child: ClipPath(
-                            clipper: CardClipper(),
-                            child: Container(
-                              width: 300,
-                              height: 400,
-                              color: Colors.black,
+                    });
+                  },
+                  onHorizontalDragEnd: (details) {
+                    if ((_dragEndX - _dragStartX).abs() > MediaQuery.of(context).size.width / 4) {
+                      _toggleCard();
+                    } else {
+                      if (_isFront) {
+                        _controller.reverse();
+                      } else {
+                        _controller.forward();
+                      }
+                    }
+                  },
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      // Back of the card (black with image)
+                      Transform(
+                        alignment: Alignment.center,
+                        transform: Matrix4.identity()
+                          ..rotateY(pi * _animation.value),
+                        child: ClipPath(
+                          clipper: CardClipper(),
+                          child: Container(
+                            width: 320,
+                            height: 430,
+                            decoration: BoxDecoration(
+                              image: DecorationImage(
+                                image: AssetImage(
+                                    'lib/Assets/Image_Comp/FlipCardImages/newbie.png'), // Replace with actual image path
+                                fit: BoxFit.cover,
+                              ),
                             ),
                           ),
                         ),
-                        // Front of the card (custom shape)
-                        Transform(
-                          alignment: Alignment.center,
-                          transform: Matrix4.identity()
-                            ..rotateY(pi * (_animation.value - 1)),
-                          child: ClipPath(
-                            clipper: CardClipper(),
+                      ),
+                      // Front of the card (custom shape)
+                      Transform(
+                        alignment: Alignment.center,
+                        transform: Matrix4.identity()
+                          ..rotateY(pi * (1 - _animation.value))
+                          ..setEntry(3, 2, 0.001), // Apply perspective to ensure a 3D effect
+                        child: ClipPath(
+                          clipper: CardClipper(),
+                          child: Opacity(
+                            opacity: _animation.value,
                             child: Container(
                               width: 320,
                               height: 430,
@@ -163,32 +318,38 @@ class _FlipCardScreenState extends State<FlipCardScreen>
                             ),
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: ElevatedButton(
-                onPressed: _captureAndSharePng,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                ),
-                child: const Text('Share Card', style: TextStyle(fontSize: 18)),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: ElevatedButton(
+              onPressed: _captureAndSharePng,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
               ),
+              child: const Text('Share Card', style: TextStyle(fontSize: 18)),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
-    );
-  }
+    ),
+  );
+}
+
 
   Widget _buildCardContent() {
-    return const Padding(
+    final now = DateTime.now();
+    final dateFormat = DateFormat('MM/dd/yyyy');
+    final timeFormat = DateFormat('hh:mm a');
+
+    return Padding(
       padding: EdgeInsets.all(16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -208,7 +369,7 @@ class _FlipCardScreenState extends State<FlipCardScreen>
                   ),
                   SizedBox(height: 8),
                   Text(
-                    '07/14/2024',
+                    dateFormat.format(now),
                     style: TextStyle(fontSize: 16, color: Colors.black),
                   ),
                   SizedBox(height: 16),
@@ -221,7 +382,7 @@ class _FlipCardScreenState extends State<FlipCardScreen>
                   ),
                   SizedBox(height: 8),
                   Text(
-                    '07:30 PM',
+                    timeFormat.format(now),
                     style: TextStyle(fontSize: 16, color: Colors.black),
                   ),
                   SizedBox(height: 16),
