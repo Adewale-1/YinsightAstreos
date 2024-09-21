@@ -47,13 +47,22 @@ class _FlipCardScreenState extends State<FlipCardScreen>
   }
 
   void _toggleCard() {
+    if (_controller.isAnimating) return; // Prevent toggle during animation
+
     if (_isFront) {
       _controller.forward();
     } else {
       _controller.reverse();
     }
-    _isFront = !_isFront;
+
+    setState(() {
+      _isFront = !_isFront;
+    });
   }
+
+  // void _toggleCard2() {
+  //   _isFront = !_isFront;
+  // }
 
   Future<void> _captureAndSharePng() async {
     try {
@@ -244,13 +253,26 @@ Widget build(BuildContext context) {
                     _dragEndX = details.globalPosition.dx;
                     double dragDistance = (_dragEndX - _dragStartX) / MediaQuery.of(context).size.width;
 
+                  //   setState(() {
+                  //     if (_isFront) {
+                  //       _controller.value = 1 - dragDistance.abs().clamp(0.0, 1.0);
+                  //     } else {
+                  //       _controller.value = dragDistance.abs().clamp(0.0, 1.0);
+                  //     }
+                  //   });
+                  // },
                     setState(() {
-                      if (_isFront) {
-                        _controller.value = 1 - dragDistance.abs().clamp(0.0, 1.0);
-                      } else {
-                        _controller.value = dragDistance.abs().clamp(0.0, 1.0);
-                      }
-                    });
+                        if (_isFront) {
+                          _controller.value = dragDistance.abs() > 0.5
+                              ? 0.5
+                              : dragDistance.abs();
+                        } else {
+                          _controller.value = 1 -
+                              (dragDistance.abs() > 0.5
+                                  ? 0.5
+                                  : dragDistance.abs());
+                        }
+                      });
                   },
                   onHorizontalDragEnd: (details) {
                     if ((_dragEndX - _dragStartX).abs() > MediaQuery.of(context).size.width / 4) {
@@ -270,6 +292,7 @@ Widget build(BuildContext context) {
                       Transform(
                         alignment: Alignment.center,
                         transform: Matrix4.identity()
+                          ..setEntry(3, 2, 0.0005)  // This adds perspective
                           ..rotateY(pi * _animation.value),
                         child: ClipPath(
                           clipper: CardClipper(),
@@ -291,7 +314,7 @@ Widget build(BuildContext context) {
                         alignment: Alignment.center,
                         transform: Matrix4.identity()
                           ..rotateY(pi * (1 - _animation.value))
-                          ..setEntry(3, 2, 0.001), // Apply perspective to ensure a 3D effect
+                          ..setEntry(3, 2, 0.0005), // Apply perspective to ensure a 3D effect
                         child: ClipPath(
                           clipper: CardClipper(),
                           child: Opacity(
