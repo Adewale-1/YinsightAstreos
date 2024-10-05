@@ -613,15 +613,18 @@ class _RecallState extends State<Recall> with TickerProviderStateMixin {
         children: [
           filePaths.isEmpty
               ? RecallHelpers.noFilesAdded()
-              : FileListView(
-                  filePaths: filePaths,
-                  notEnableDelete: notEnableDelete,
-                  onDeleteFile: _onDeleteFile,
-                  selectedFiles: selectedFiles,
-                  isSelectionModeEnabled: isSelectionModeEnabled,
-                  onFileSelected: (index, isSelected) =>
-                      _handleFileSelection(context, index, isSelected),
-                ),
+              : Padding(
+                padding: const EdgeInsets.only(bottom: 70.0),
+                child: FileListView(
+                    filePaths: filePaths,
+                    notEnableDelete: notEnableDelete,
+                    onDeleteFile: _onDeleteFile,
+                    selectedFiles: selectedFiles,
+                    isSelectionModeEnabled: isSelectionModeEnabled,
+                    onFileSelected: (index, isSelected) =>
+                        _handleFileSelection(context, index, isSelected),
+                  ),
+              ),
           RecallHelpers.fadeUpWidget(_addFile),
         ],
       ),

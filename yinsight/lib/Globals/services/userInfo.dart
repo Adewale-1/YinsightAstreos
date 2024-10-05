@@ -6,8 +6,8 @@ import 'package:http/http.dart' as http;
 /// A class to handle user information and related operations.
 class UserInformation {
   // static const http_endpoint = 'http://192.168.0.217:8080';
-  // static const http_endpoint = 'https://yinsight-eabd41a7f368.herokuapp.com';
-  static const http_endpoint = 'http://172.27.37.82:8080';
+  static const http_endpoint = 'https://yinsight-eabd41a7f368.herokuapp.com';
+  // static const http_endpoint = 'http://172.27.37.82:8080';
 
   static final Map<String, String> routes = {
     'signup': '/signup',

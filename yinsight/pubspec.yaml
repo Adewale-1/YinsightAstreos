@@ -124,6 +124,8 @@ flutter:
     - lib/Assets/Image_Comp/Splash/appstore.png
     - lib/Assets/Image_Comp/Icons/singleCoin.gif
 
+    - lib/Assets/Image_Comp/FlipCardImages/newbie.png
+
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
 
