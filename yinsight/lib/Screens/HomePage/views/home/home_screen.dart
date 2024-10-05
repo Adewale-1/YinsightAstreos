@@ -10,10 +10,7 @@ import 'package:yinsight/Screens/HomePage/services/navigation_service.dart';
 import 'package:yinsight/Screens/HomePage/widgets/assignment_info_card.dart';
 import 'package:yinsight/Screens/HomePage/widgets/avatar.dart';
 import 'package:yinsight/Screens/HomePage/widgets/card_schedule_widget.dart';
-import 'package:yinsight/Screens/Focus/views/focusCardOnHomePage.dart';
-import 'package:yinsight/Screens/HomePage/widgets/progress_info_card.dart';
-import 'package:yinsight/Screens/HomePage/widgets/recall_card.dart';
-import 'package:yinsight/Screens/HomePage/widgets/reflection_card.dart';
+import 'package:http/http.dart' as http;
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({
@@ -37,7 +34,7 @@ class _HomeScreenState extends State<HomeScreen>
   late AnimationController _animationController;
   late Animation<double> _animation;
 
-  get http => null;
+  //get http => null;
   String activity = "userOpenedApp";
 
   @override
@@ -219,10 +216,31 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
+  /// Fetches the number of tasks created by the user.
+  ///
+  /// Returns the total number of tasks created as an integer.
+  Future<int> fetchNumberOfTasksCreated() async {
+    final user = FirebaseAuth.instance.currentUser;
+    final token = await user?.getIdToken();
+    if (token == null) {
+      throw Exception('No token found');
+    }
+    final response = await http.get(
+      Uri.parse(UserInformation.getRoute('NumberOfTasksCreated')),
+      headers: {
+        'Authorization': token,
+      },
+    );
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return data['total_number_of_tasks'];
+    } else {
+      throw Exception('Failed to load task count');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    double screenHeight = MediaQuery.of(context).size.height;
-    double screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -314,6 +332,53 @@ class _HomeScreenState extends State<HomeScreen>
                                   color: Colors.green,
                                   onTap: () => widget.onSectionTap(1),
                                 ),
+
+                                // add the current number of tasks present for the user
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 10.0),
+                                  child: Row(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      FutureBuilder<int>(
+                                        future: fetchNumberOfTasksCreated(),
+                                        builder: (context, snapshot) {
+                                          if (snapshot.hasData) {
+                                            return Text(
+                                              snapshot.data.toString(),
+                                              style: const TextStyle(
+                                                color: Colors.green,
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            );
+                                          } else if (snapshot.hasError) {
+                                            return const Text(
+                                              '?',
+                                              style: TextStyle(
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            );
+                                          } else {
+                                            return const CircularProgressIndicator();
+                                          }
+                                        },
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        'Current Missions',
+                                        style: GoogleFonts.lexend(
+                                          textStyle: const TextStyle(
+                                            color: Colors.green,
+                                            fontSize: 15.0,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+
                                 const SizedBox(height: 10),
                                 AssignmentInfoCard(
                                   title: 'Reflect',
@@ -328,67 +393,43 @@ class _HomeScreenState extends State<HomeScreen>
 
                         const SizedBox(width: 10),
 
-                        Expanded(
-                          child: Container(
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(color: Colors.black),
-                            ),
-                            child: Column(
-                              children: [
-                                ProgressInfoCard(
-                                  title: 'Recall',
-                                  progress: 0.7,
-                                  color: Colors.red,
-                                  onTap: () => widget.onSectionTap(2),
-                                ),
-                                const SizedBox(height: 10),
-                                ProgressInfoCard(
-                                  title: 'Focus',
-                                  progress: 0.5,
-                                  color: Colors.green,
-                                  onTap: () => widget.onSectionTap(1),
-                                ),
-                                const SizedBox(height: 10),
-                                ProgressInfoCard(
-                                  title: 'Reflect',
-                                  progress: 0.9,
-                                  color: Colors.blue,
-                                  onTap: () => widget.onSectionTap(3),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
+                        // Expanded(
+                        //   child: Container(
+                        //     padding: const EdgeInsets.all(10),
+                        //     decoration: BoxDecoration(
+                        //       borderRadius: BorderRadius.circular(10),
+                        //       border: Border.all(color: Colors.black),
+                        //     ),
+                        //     child: Column(
+                        //       children: [
+                        //         ProgressInfoCard(
+                        //           title: 'Recall',
+                        //           progress: 0.7,
+                        //           color: Colors.red,
+                        //           onTap: () => widget.onSectionTap(2),
+                        //         ),
+                        //         const SizedBox(height: 10),
+                        //         ProgressInfoCard(
+                        //           title: 'Focus',
+                        //           progress: 0.5,
+                        //           color: Colors.green,
+                        //           onTap: () => widget.onSectionTap(1),
+                        //         ),
+                        //         const SizedBox(height: 10),
+                        //         ProgressInfoCard(
+                        //           title: 'Reflect',
+                        //           progress: 0.9,
+                        //           color: Colors.blue,
+                        //           onTap: () => widget.onSectionTap(3),
+                        //         ),
+                        //       ],
+                        //     ),
+                        //   ),
+                        // ),
                       ],
                     ),
 
                     const SizedBox(height: 10,),
-
-                    const FocusCard(
-                      height: 150),
-
-                    const SizedBox(height: 20),// 2% of the screen height for spacing
-
-                      Row(
-                        children: [
-                          Expanded(
-                            child: RecallCard(
-                              onTap: () => NavigationService.navigateToRecall(context),
-                              height: screenHeight * 0.2, // 10% of the screen height
-                            ),
-                          ),
-                          SizedBox(width: screenWidth * 0.02), // 2% of the screen width for spacing
-                          Expanded(
-                            child: ReflectionCard(
-                              onTap: () => NavigationService.navigateToReflection(context),
-                              cardHeight: screenHeight * 0.2, // 10% of the screen height
-                              cardWidth: screenWidth * 0.45, // 45% of the screen width
-                            ),
-                          ),
-                        ],
-                      ),
                   ],
                 ),
               ),
