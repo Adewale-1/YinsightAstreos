@@ -52,6 +52,7 @@ post_install do |installer|
       config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '12.0'
     end
 
+
     # Specific fix for BoringSSL-GRPC compiler flags
     if target.name == 'BoringSSL-GRPC'
       target.source_build_phase.files.each do |file|
@@ -63,5 +64,15 @@ post_install do |installer|
       end
     end
   end
+  # Awesome Notifications pod modification 1
+  awesome_pod_file = File.expand_path(File.join('plugins', 'awesome_notifications', 'ios', 'Scripts', 'AwesomePodFile'), '.symlinks')
+  require awesome_pod_file
+  update_awesome_pod_build_settings(installer)
+
 end
+
+# Awesome Notifications pod modification 2
+awesome_pod_file = File.expand_path(File.join('plugins', 'awesome_notifications', 'ios', 'Scripts', 'AwesomePodFile'), '.symlinks')
+require awesome_pod_file
+update_awesome_main_target_settings('Runner', File.dirname(File.realpath(__FILE__)), flutter_root)
 

@@ -1,5 +1,5 @@
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'dart:convert';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 import 'package:yinsight/Globals/services/userInfo.dart';
@@ -11,7 +11,6 @@ class RecallServices {
   /// [selectedFileNames]: A set of selected file names.
   ///
   /// Throws an [Exception] if no token is found.
-
   static Future<bool> generateQuestions(Set<String> selectedFiles) async {
     try {
       final user = FirebaseAuth.instance.currentUser;
@@ -51,10 +50,31 @@ class RecallServices {
       }
 
       print('All questions generated successfully');
+
+      // Trigger the push notification after successful generation
+      await AwesomeNotifications().createNotification(
+        content: NotificationContent(
+          id: 10,
+          channelKey: 'basic_channel', // Same as the one defined in main.dart
+          title: 'Questions Generated!',
+          body: 'Your questions have been successfully generated.',
+        ),
+      );
+
       return true;
     } catch (e, stackTrace) {
       print('Error generating questions: $e');
       print('Stack trace: $stackTrace');
+      // Trigger the push notification after successful generation
+      await AwesomeNotifications().createNotification(
+        content: NotificationContent(
+          id: 10,
+          channelKey: 'basic_channel', // Same as the one defined in main.dart
+          title: 'Questions Generated!',
+          body:
+              'An error occurred while generating questions, please try again.',
+        ),
+      );
       return false;
     }
   }

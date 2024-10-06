@@ -1,3 +1,4 @@
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -298,6 +299,17 @@ class RecallHelpers {
                   if (success) {
                     await onGenerationComplete();
                   } else {
+                    // Trigger the push notification after successful generation
+                    await AwesomeNotifications().createNotification(
+                      content: NotificationContent(
+                        id: 10,
+                        channelKey:
+                            'basic_channel', // Same as the one defined in main.dart
+                        title: 'Questions Generated!',
+                        body:
+                            'Your questions have been successfully generated.',
+                      ),
+                    );
                     // Handle the case where generation was not successful
                     print("Question generation was not successful");
                     // You might want to show an error message to the user here

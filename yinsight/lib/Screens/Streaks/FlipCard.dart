@@ -227,41 +227,42 @@ class _FlipCardScreenState extends State<FlipCardScreen>
   //   );
   // }
 
-@override
-Widget build(BuildContext context) {
-  return Scaffold(
-    appBar: AppBar(
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back),
-        onPressed: () {
-          Navigator.pop(context);
-        },
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
       ),
-    ),
-    body: SafeArea(
-      child: Column(
-        children: [
-          Expanded(
-            child: Center(
-              child: Screenshot(
-                controller: screenshotController,
-                child: GestureDetector(
-                  onHorizontalDragStart: (details) {
-                    _dragStartX = details.globalPosition.dx;
-                  },
-                  onHorizontalDragUpdate: (details) {
-                    _dragEndX = details.globalPosition.dx;
-                    double dragDistance = (_dragEndX - _dragStartX) / MediaQuery.of(context).size.width;
+      body: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              child: Center(
+                child: Screenshot(
+                  controller: screenshotController,
+                  child: GestureDetector(
+                    onHorizontalDragStart: (details) {
+                      _dragStartX = details.globalPosition.dx;
+                    },
+                    onHorizontalDragUpdate: (details) {
+                      _dragEndX = details.globalPosition.dx;
+                      double dragDistance = (_dragEndX - _dragStartX) /
+                          MediaQuery.of(context).size.width;
 
-                  //   setState(() {
-                  //     if (_isFront) {
-                  //       _controller.value = 1 - dragDistance.abs().clamp(0.0, 1.0);
-                  //     } else {
-                  //       _controller.value = dragDistance.abs().clamp(0.0, 1.0);
-                  //     }
-                  //   });
-                  // },
-                    setState(() {
+                      //   setState(() {
+                      //     if (_isFront) {
+                      //       _controller.value = 1 - dragDistance.abs().clamp(0.0, 1.0);
+                      //     } else {
+                      //       _controller.value = dragDistance.abs().clamp(0.0, 1.0);
+                      //     }
+                      //   });
+                      // },
+                      setState(() {
                         if (_isFront) {
                           _controller.value = dragDistance.abs() > 0.5
                               ? 0.5
@@ -273,99 +274,102 @@ Widget build(BuildContext context) {
                                   : dragDistance.abs());
                         }
                       });
-                  },
-                  onHorizontalDragEnd: (details) {
-                    if ((_dragEndX - _dragStartX).abs() > MediaQuery.of(context).size.width / 4) {
-                      _toggleCard();
-                    } else {
-                      if (_isFront) {
-                        _controller.reverse();
+                    },
+                    onHorizontalDragEnd: (details) {
+                      if ((_dragEndX - _dragStartX).abs() >
+                          MediaQuery.of(context).size.width / 4) {
+                        _toggleCard();
                       } else {
-                        _controller.forward();
+                        if (_isFront) {
+                          _controller.reverse();
+                        } else {
+                          _controller.forward();
+                        }
                       }
-                    }
-                  },
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      // Back of the card (black with image)
-                      Transform(
-                        alignment: Alignment.center,
-                        transform: Matrix4.identity()
-                          ..setEntry(3, 2, 0.0005)  // This adds perspective
-                          ..rotateY(pi * _animation.value),
-                        child: ClipPath(
-                          clipper: CardClipper(),
-                          child: Container(
-                            width: 320,
-                            height: 430,
-                            decoration: BoxDecoration(
-                              image: DecorationImage(
-                                image: AssetImage(
-                                    'lib/Assets/Image_Comp/FlipCardImages/newbie.png'), // Replace with actual image path
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      // Front of the card (custom shape)
-                      Transform(
-                        alignment: Alignment.center,
-                        transform: Matrix4.identity()
-                          ..rotateY(pi * (1 - _animation.value))
-                          ..setEntry(3, 2, 0.0005), // Apply perspective to ensure a 3D effect
-                        child: ClipPath(
-                          clipper: CardClipper(),
-                          child: Opacity(
-                            opacity: _animation.value,
+                    },
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        // Back of the card (black with image)
+                        Transform(
+                          alignment: Alignment.center,
+                          transform: Matrix4.identity()
+                            ..setEntry(3, 2, 0.0005) // This adds perspective
+                            ..rotateY(pi * _animation.value),
+                          child: ClipPath(
+                            clipper: CardClipper(),
                             child: Container(
                               width: 320,
                               height: 430,
                               decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: const BorderRadius.only(
-                                  topRight: Radius.circular(20),
-                                  bottomLeft: Radius.circular(20),
+                                color: Colors.grey[600],
+                                image: const DecorationImage(
+                                  image: AssetImage(
+                                      'lib/Assets/Image_Comp/FlipCardImages/newbie.png'), // Replace with actual image path
+                                  fit: BoxFit.cover,
                                 ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.grey.withOpacity(1.0),
-                                    spreadRadius: 5,
-                                    blurRadius: 7,
-                                    offset: const Offset(0, 3),
-                                  ),
-                                ],
                               ),
-                              child: _buildCardContent(),
                             ),
                           ),
                         ),
-                      ),
-                    ],
+                        // Front of the card (custom shape)
+                        Transform(
+                          alignment: Alignment.center,
+                          transform: Matrix4.identity()
+                            ..rotateY(pi * (1 - _animation.value))
+                            ..setEntry(3, 2,
+                                0.0005), // Apply perspective to ensure a 3D effect
+                          child: ClipPath(
+                            clipper: CardClipper(),
+                            child: Opacity(
+                              opacity: _animation.value,
+                              child: Container(
+                                width: 320,
+                                height: 430,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: const BorderRadius.only(
+                                    topRight: Radius.circular(20),
+                                    bottomLeft: Radius.circular(20),
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.grey.withOpacity(1.0),
+                                      spreadRadius: 5,
+                                      blurRadius: 7,
+                                      offset: const Offset(0, 3),
+                                    ),
+                                  ],
+                                ),
+                                child: _buildCardContent(),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: ElevatedButton(
-              onPressed: _captureAndSharePng,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: ElevatedButton(
+                onPressed: _captureAndSharePng,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  foregroundColor: Colors.white,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                ),
+                child: const Text('Share Card', style: TextStyle(fontSize: 18)),
               ),
-              child: const Text('Share Card', style: TextStyle(fontSize: 18)),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-    ),
-  );
-}
-
+    );
+  }
 
   Widget _buildCardContent() {
     final now = DateTime.now();
@@ -449,10 +453,10 @@ Widget build(BuildContext context) {
                 style: TextStyle(fontSize: 16, color: Colors.black),
               ),
               Spacer(),
-              Text(
-                '1',
-                style: TextStyle(fontSize: 16, color: Colors.black),
-              ),
+              // Text(
+              // '1',
+              // style: TextStyle(fontSize: 16, color: Colors.black),
+              // ),
             ],
           ),
         ],

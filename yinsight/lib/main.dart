@@ -69,7 +69,9 @@ class MyApp extends StatelessWidget {
       ),
 
       // Direct to MainNavigationScreen if a user is logged in
-      initialRoute: FirebaseAuth.instance.currentUser != null ? MainNavigationScreen.id : OnboardingController.id,
+      initialRoute: FirebaseAuth.instance.currentUser != null
+          ? MainNavigationScreen.id
+          : OnboardingController.id,
       onGenerateRoute: (settings) {
         if (settings.name == HomeScreen.id) {
           final args = settings.arguments as Function(int);

@@ -484,6 +484,7 @@ class _RecallState extends State<Recall> with TickerProviderStateMixin {
     if (response.statusCode == 200) {
       var data = jsonDecode(response.body);
       List<String> files = List<String>.from(data['files']);
+      print('Files: $files');
       setState(() {
         filePaths = files;
       });
@@ -614,8 +615,8 @@ class _RecallState extends State<Recall> with TickerProviderStateMixin {
           filePaths.isEmpty
               ? RecallHelpers.noFilesAdded()
               : Padding(
-                padding: const EdgeInsets.only(bottom: 70.0),
-                child: FileListView(
+                  padding: const EdgeInsets.only(bottom: 70.0),
+                  child: FileListView(
                     filePaths: filePaths,
                     notEnableDelete: notEnableDelete,
                     onDeleteFile: _onDeleteFile,
@@ -624,7 +625,7 @@ class _RecallState extends State<Recall> with TickerProviderStateMixin {
                     onFileSelected: (index, isSelected) =>
                         _handleFileSelection(context, index, isSelected),
                   ),
-              ),
+                ),
           RecallHelpers.fadeUpWidget(_addFile),
         ],
       ),
