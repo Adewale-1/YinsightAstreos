@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -5,8 +6,6 @@ import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:yinsight/Globals/services/userInfo.dart';
-
-
 import 'package:yinsight/Screens/HomePage/widgets/Calender/calenderSelection.dart';
 import 'package:yinsight/Screens/Login_Signup/services/user_Authentication.dart';
 
@@ -18,10 +17,13 @@ class SettingsScreen extends StatefulWidget {
   _SettingsScreenState createState() => _SettingsScreenState();
 }
 
+
+
 class _SettingsScreenState extends State<SettingsScreen> {
-  bool isDarkMode = false; // Assuming a light mode by default
+  bool isDarkMode = false;
   UserInformation userInformation = UserInformation();
   final Uri _url = Uri.parse('https://tally.so/r/wg0x1l');
+  File? _localImage;
 
   /// Launches the feedback URL.
   Future<void> _launchUrl() async {
@@ -29,6 +31,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
       throw Exception('Could not launch $_url');
     }
   }
+
+  int _reloadImageKey = 0;
+
+  Future<String> _getUserImage() {
+    return UserInformation.getUserImage();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,104 +45,120 @@ class _SettingsScreenState extends State<SettingsScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
-        title: const Text('Settings',
+        title: const Text(
+          'Settings',
           style: TextStyle(
             color: Colors.black,
           ),
         ),
-        actions: const [
-          // IconButton(
-          //   icon: Icon(isDarkMode ? Icons.light_mode : Icons.dark_mode, color: Colors.black,),
-          //   onPressed: () {
-          //     setState(() {
-          //       isDarkMode = !isDarkMode;
-          //       // Implement the actual dark/light mode switch logic here
-          //     });
-          //   },
-          // ),
-        ],
+        actions: const [],
       ),
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
-          
           children: [
             const SizedBox(height: 35),
             FutureBuilder<String>(
-              future: UserInformation.getUserImage(), // Fetch the URL
+              future: _getUserImage(),
               builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  // Return a loader or placeholder when the future is still loading
-                  return const CircleAvatar(
-                    radius: 70,
-                    backgroundImage: AssetImage('lib/Assets/Image_Comp/HomeImages/User.png'), // Placeholder image
-                  );
-                } else if (snapshot.hasData && snapshot.data != "Error fetching user data") {
-                  // If data is received, use it as the profile picture
+                if (_localImage != null) {
                   return CircleAvatar(
                     radius: 70,
-                    backgroundImage: NetworkImage(snapshot.data!),
+                    backgroundImage: FileImage(_localImage!),
                   );
-                } else {
-                  // Handle error or data not found case
+                } else if (snapshot.connectionState ==
+                    ConnectionState.waiting) {
                   return const CircleAvatar(
                     radius: 70,
-                    backgroundImage: AssetImage('lib/Assets/Image_Comp/HomeImages/User.png'), // Default or error image
+                    backgroundImage:
+                        AssetImage('lib/Assets/Image_Comp/HomeImages/User.png'),
+                  );
+                } else if (snapshot.hasData &&
+                    snapshot.data != "Error fetching user data") {
+                  // Append a unique parameter to force image refresh
+                  String imageUrl = snapshot.data! + '?v=$_reloadImageKey';
+                  return CircleAvatar(
+                    radius: 70,
+                    backgroundImage: NetworkImage(imageUrl),
+                  );
+                } else {
+                  return const CircleAvatar(
+                    radius: 70,
+                    backgroundImage:
+                        AssetImage('lib/Assets/Image_Comp/HomeImages/User.png'),
                   );
                 }
               },
             ),
             TextButton(
-              /* Implement the add profile picture to the database */
-                onPressed: () async {
+              onPressed: () async {
+                try {
                   final ImagePicker picker = ImagePicker();
-                  // Pick an image
-                  final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+                  final XFile? image =
+                      await picker.pickImage(source: ImageSource.gallery);
 
                   if (image != null) {
-                    // Get the user token
+                    setState(() {
+                      _localImage = File(image.path);
+                    });
+
                     final user = FirebaseAuth.instance.currentUser;
                     final String? token = await user?.getIdToken();
 
                     if (token == null) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Authentication token not found')),
+                        const SnackBar(
+                            content: Text('Authentication token not found')),
                       );
                       return;
                     }
 
-                    // Create a MultipartRequest to upload the file
-                    Uri uri = Uri.parse(UserInformation.getRoute('uploadProfilePicture'));
+                    Uri uri = Uri.parse(
+                        UserInformation.getRoute('uploadProfilePicture'));
                     var request = http.MultipartRequest('POST', uri)
-                      ..files.add(await http.MultipartFile.fromPath('profile_picture', image.path))
+                      ..files.add(await http.MultipartFile.fromPath(
+                          'profile_picture', image.path))
                       ..headers.addAll({
                         "Authorization": token,
                       });
 
-                    // Send the request
                     var response = await request.send();
 
-                    // Handle the response
                     if (response.statusCode == 200) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Profile picture updated successfully')),
+                        const SnackBar(
+                            content:
+                                Text('Profile picture updated successfully')),
                       );
 
-                      // Optionally, trigger a state update to reflect the new profile picture
+                      final imageUrl = await UserInformation.getUserImage();
+                      PaintingBinding.instance.imageCache
+                          .evict(NetworkImage(imageUrl));
+
+                      setState(() {
+                        _localImage = null;
+                        _reloadImageKey++;
+                      });
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Failed to update profile picture. Status code: ${response.statusCode}')),
+                        SnackBar(
+                            content: Text(
+                                'Failed to update profile picture. Status code: ${response.statusCode}')),
                       );
                     }
                   }
-                },
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('An error occurred: $e')),
+                  );
+                }
+              },
               child: const Text(
                 "Add Profile Picture",
                 style: TextStyle(
                   color: Colors.blue,
                 ),
-              )
-              
+              ),
             ),
             ListTile(
               leading: SvgPicture.asset(
@@ -141,7 +166,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 width: 24, // Set your desired icon width
                 height: 24, // Set your desired icon height
               ),
-              title: const Text('Calendar Sync',
+              title: const Text(
+                'Calendar Sync',
                 style: TextStyle(
                   color: Colors.black,
                 ),
@@ -149,7 +175,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const CalendarSelectionScreen()),
+                  MaterialPageRoute(
+                      builder: (context) => const CalendarSelectionScreen()),
                 );
               },
             ),
@@ -167,14 +194,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
             ListTile(
               leading: const Icon(Icons.logout),
-              title: const Text('Logout',
+              title: const Text(
+                'Logout',
                 style: TextStyle(
                   color: Colors.black,
                 ),
               ),
-              onTap: () =>  AuthServices(context).signOut(),
+              onTap: () => AuthServices(context).signOut(),
             ),
-         
+
             // Add additional settings options as needed
           ],
         ),

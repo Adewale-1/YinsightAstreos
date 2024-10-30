@@ -9,6 +9,7 @@ import 'package:yinsight/Globals/services/userInfo.dart';
 import 'package:yinsight/Screens/HomePage/widgets/Calender/eventsCalender.dart';
 import 'package:yinsight/Screens/Login_Signup/widgets/SignInScreen.dart';
 import 'package:http/http.dart' as http;
+import 'package:yinsight/Screens/Onboarding/GifWithContinueScreen.dart';
 import 'dart:convert';
 
 import 'package:yinsight/navigationBar.dart';
@@ -92,7 +93,10 @@ class AuthServices {
         String? freshIdToken = await refreshTokenWithToken(token);
         // Use freshIdToken as needed or proceed without it if not explicitly needed
         Navigator.pushNamedAndRemoveUntil(
-            context, MainNavigationScreen.id, (Route<dynamic> route) => false);
+          context,
+          GifWithContinueScreen.id,
+          (Route<dynamic> route) => false,
+        );
       }
     } on FirebaseAuthException catch (e) {
       // Display snackbar to inform user about sign-in failure

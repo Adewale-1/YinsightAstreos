@@ -5,7 +5,6 @@ import 'package:animate_do/animate_do.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:yinsight/Screens/HomePage/views/home/home_screen.dart';
 import 'package:yinsight/Screens/Login_Signup/widgets/SignInScreen.dart';
@@ -47,19 +46,22 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   /// Navigates to the home screen.
-  void _SignUp(void Function(int index) onSectionTap) { 
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => HomeScreen(onSectionTap: onSectionTap),
-      ),
-    );
-  }
+  // void _SignUp(void Function(int index) onSectionTap) {
+  //   print("got to before push\n\n\n");
+  //   Navigator.push(
+  //     context,
+  //     MaterialPageRoute(
+  //       builder: (context) => HomeScreen(onSectionTap: onSectionTap),
+  //     ),
+  //   );
+  // }
+
   /// Attempts to sign up a new user by validating the form and calling the appropriate service method.
   void _trySignUp() {
     if (_formKey.currentState!.validate()) {
       // Assuming you have text editing controllers for all fields
-      String formattedPhoneNumber = '$_selectedCountryCode${phoneNumberController.text}';
+      String formattedPhoneNumber =
+          '$_selectedCountryCode${phoneNumberController.text}';
 
       // print("got to before create User");
 
@@ -73,7 +75,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         age: int.parse(ageController.text),
         password: passwordController.text,
       );
-      
+
       // print("got to after create User");
     }
   }
@@ -95,12 +97,20 @@ class _SignUpScreenState extends State<SignUpScreen> {
   /// [validator]: The validator function for the TextFormField.
   ///
   /// Returns a FadeInUp widget.
-  FadeInUp fadeAnimation(int delay, int duration, TextInputType keyboardType,
-      String labelText, String hintText, IconData iconName, TextEditingController controller,String? Function(String?)? validator) {
+  FadeInUp fadeAnimation(
+      int delay,
+      int duration,
+      TextInputType keyboardType,
+      String labelText,
+      String hintText,
+      IconData iconName,
+      TextEditingController controller,
+      String? Function(String?)? validator) {
     return FadeInUp(
       delay: Duration(milliseconds: delay),
       duration: Duration(milliseconds: duration),
-      child: TextFormField( // Use TextFormField here
+      child: TextFormField(
+        // Use TextFormField here
         controller: controller,
         obscureText: labelText == 'Password' ? true : false,
         keyboardType: keyboardType,
@@ -141,10 +151,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
-  final List<String> _countryCodes = ['+1', '+44', '+91','+123'];
+  final List<String> _countryCodes = ['+1', '+44', '+91', '+123'];
   String? _selectedCountryCode = '+1';
-
-
 
   /// Creates a FadeInUp widget with a dropdown for country codes and a TextFormField for phone numbers.
   ///
@@ -154,7 +162,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
   /// [validator]: The validator function for the TextFormField.
   ///
   /// Returns a FadeInUp widget.
-  FadeInUp fadeAnimationWithDropdown(int delay, int duration, TextEditingController phoneController, String? Function(String?)? validator) {
+  FadeInUp fadeAnimationWithDropdown(
+      int delay,
+      int duration,
+      TextEditingController phoneController,
+      String? Function(String?)? validator) {
     return FadeInUp(
       delay: Duration(milliseconds: delay),
       duration: Duration(milliseconds: duration),
@@ -167,7 +179,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
               dropdownColor: Colors.white,
               decoration: InputDecoration(
                 labelText: 'Code',
-                contentPadding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
+                contentPadding: const EdgeInsets.symmetric(
+                    vertical: 10.0, horizontal: 10.0),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
@@ -178,10 +191,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   _selectedCountryCode = newValue;
                 });
               },
-              items: _countryCodes.map<DropdownMenuItem<String>>((String value) {
+              items:
+                  _countryCodes.map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
-                  child: Text(value, style: const TextStyle(color: Colors.black),),
+                  child: Text(
+                    value,
+                    style: const TextStyle(color: Colors.black),
+                  ),
                 );
               }).toList(),
             ),
@@ -207,7 +224,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
       ),
     );
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -286,99 +302,128 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                   const SizedBox(height: 15),
                   fadeAnimation(
-                      800,
-                      100,
-                      TextInputType.emailAddress,
-                      'First Name',
-                      'at most 10 characters',
-                      FontAwesomeIcons.user,
-                      firstNameController,
-                      (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter your first name';
-                        } else if (value.length > 10) {
-                          return 'First name cannot exceed 10 characters';
-                        }
-                        return null; 
-                      },
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  fadeAnimation(900, 250, TextInputType.emailAddress, 'Last Name',
-                      'at most 10 characters', FontAwesomeIcons.user,
-                      lastNameController,
-                      (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter your last name';
-                        } else if (value.length > 10) {
-                          return 'Last name cannot exceed 10 characters';
-                        }
-                        return null; 
-                      },
-                    ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  fadeAnimation(1000, 500, TextInputType.emailAddress, 'Username',
-                      'Username', FontAwesomeIcons.user,
-                      usernameController,
-                      (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter your Username';
-                        }
-                        return null; 
-                      },),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  fadeAnimation(1000, 500, TextInputType.emailAddress, 'Email',
-                      'Email', FontAwesomeIcons.envelope, 
-                      emailController,
-                      (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter your Email';
-                        }
-                        return null; 
-                      },),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  fadeAnimationWithDropdown(
-                    1000, 
-                    500, 
-                    phoneNumberController, 
+                    800,
+                    100,
+                    TextInputType.emailAddress,
+                    'First Name',
+                    'at most 10 characters',
+                    FontAwesomeIcons.user,
+                    firstNameController,
                     (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter your phone number';
+                        return 'Please enter your first name';
+                      } else if (value.length > 10) {
+                        return 'First name cannot exceed 10 characters';
                       }
-                      return null; 
+                      return null;
                     },
                   ),
                   const SizedBox(
                     height: 20,
                   ),
-                  fadeAnimation(1000, 500, TextInputType.number, 'Age',
-                      'Age', FontAwesomeIcons.user,
-                      ageController,
-                      (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter your Age';
-                        } 
-                        return null; 
-                      },),
+                  fadeAnimation(
+                    900,
+                    250,
+                    TextInputType.emailAddress,
+                    'Last Name',
+                    'at most 10 characters',
+                    FontAwesomeIcons.user,
+                    lastNameController,
+                    (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your last name';
+                      } else if (value.length > 10) {
+                        return 'Last name cannot exceed 10 characters';
+                      }
+                      return null;
+                    },
+                  ),
                   const SizedBox(
                     height: 20,
                   ),
-                  fadeAnimation(1100, 750, TextInputType.visiblePassword,
-                      'Password', 'Password', FontAwesomeIcons.key, 
-                      passwordController,
-                      (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter your Password';
-                        } 
-                        return null; 
-                      },),
+                  fadeAnimation(
+                    1000,
+                    500,
+                    TextInputType.emailAddress,
+                    'Username',
+                    'Username',
+                    FontAwesomeIcons.user,
+                    usernameController,
+                    (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your Username';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  fadeAnimation(
+                    1000,
+                    500,
+                    TextInputType.emailAddress,
+                    'Email',
+                    'Email',
+                    FontAwesomeIcons.envelope,
+                    emailController,
+                    (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your Email';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  fadeAnimationWithDropdown(
+                    1000,
+                    500,
+                    phoneNumberController,
+                    (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your phone number';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  fadeAnimation(
+                    1000,
+                    500,
+                    TextInputType.number,
+                    'Age',
+                    'Age',
+                    FontAwesomeIcons.user,
+                    ageController,
+                    (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your Age';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  fadeAnimation(
+                    1100,
+                    750,
+                    TextInputType.visiblePassword,
+                    'Password',
+                    'Password',
+                    FontAwesomeIcons.key,
+                    passwordController,
+                    (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your Password';
+                      }
+                      return null;
+                    },
+                  ),
                   const SizedBox(
                     height: 30,
                   ),
@@ -426,7 +471,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             _SignIn();
                           },
                           ////////////////////////////////////////// Route To Register Page- chnage content in pushReplacement to register page  ///////////////////////////////////////
-              
+
                           child: const Text(
                             "Sign In",
                             style: TextStyle(

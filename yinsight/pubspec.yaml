@@ -77,6 +77,8 @@ dependencies:
   flutter_heatmap_calendar: ^1.0.5
   flutter_card_swiper: ^7.0.1
   flutter_math_fork: ^0.7.2
+  video_player: ^2.9.2
+  cached_network_image: any
   
 dev_dependencies:
   flutter_test:
@@ -123,10 +125,14 @@ flutter:
     - lib/Assets/Image_Comp/HomeImages/User.png
     - lib/Assets/Image_Comp/OnboardingImages/girlStudying.png
     - lib/Assets/Image_Comp/OnboardingImages/potential.png
-    - lib/Assets/Image_Comp/Splash/appLogo.png
+    - lib/Assets/Image_Comp/OnboardingImages/homepageWorkflow.mp4
+
     - lib/Assets/Image_Comp/Icons/singleCoin.gif
+    - lib/Assets/Image_Comp/Splash/appLogo.png
+
 
     - lib/Assets/Image_Comp/FlipCardImages/newbie.png
+  
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
@@ -142,7 +148,7 @@ flutter:
   fonts:
     - family: NotoSansMath
       fonts:
-        - asset: Assets/Fonts/NotoSansMath-Regular.ttf
+        - asset: lib/Assets/Fonts/NotoSansMath-Regular.ttf
   #       - asset: fonts/Schyler-Italic.ttf
   #         style: italic
 
@@ -157,12 +163,15 @@ flutter:
 
 flutter_native_splash:
   color: "#010030"
-  image:  lib/Assets/Image_Comp/Splash/appLogo.png
+  image: lib/Assets/Image_Comp/Splash/appLogo.png
+  # image_width: 150   # Width in dp (Android) or pt (iOS)
+  # image_height: 150  # Height in dp (Android) or pt (iOS)
   android: true
   ios: true
   web: false
 
   android_12:
     color: "#010030"
-    image:  lib/Assets/Image_Comp/Splash/appLogo.png
-  
+    image: lib/Assets/Image_Comp/Splash/appLogo.png
+    # image_width: 150
+    # image_height: 150

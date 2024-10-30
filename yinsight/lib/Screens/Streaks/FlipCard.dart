@@ -421,10 +421,10 @@ class _FlipCardScreenState extends State<FlipCardScreen>
                         color: Colors.black),
                   ),
                   SizedBox(height: 8),
-                  Text(
-                    '@THEPRASANJITSAHOO',
-                    style: TextStyle(fontSize: 16, color: Colors.black),
-                  ),
+                  // Text(
+                  //   '@THEPRASANJITSAHOO',
+                  //   style: TextStyle(fontSize: 16, color: Colors.black),
+                  // ),
                 ],
               ),
               Icon(
