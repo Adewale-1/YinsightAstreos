@@ -13,7 +13,8 @@ class QuestionsScreen extends StatefulWidget {
   State<QuestionsScreen> createState() => _QuestionsScreenState();
 }
 
-class _QuestionsScreenState extends State<QuestionsScreen>with SingleTickerProviderStateMixin {
+class _QuestionsScreenState extends State<QuestionsScreen>
+    with SingleTickerProviderStateMixin {
   OverlayEntry? _overlayEntry;
   late AnimationController _animationController;
   late Animation<double> _animation;
@@ -233,10 +234,15 @@ class _QuestionsScreenState extends State<QuestionsScreen>with SingleTickerProvi
                 const SizedBox(height: 8),
                 Text(
                   question['question'],
-                  style: const TextStyle(fontSize: 16, color: Colors.black),
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: Colors.black,
+                    fontFamily: 'NotoSansMath',
+                  ),
                 ),
                 const SizedBox(height: 16),
                 ExpansionTile(
+                  key: Key('expansionTile_$index'), // Add this line
                   title: const Text(
                     'Show Answer',
                     style: TextStyle(
@@ -249,8 +255,11 @@ class _QuestionsScreenState extends State<QuestionsScreen>with SingleTickerProvi
                       padding: const EdgeInsets.all(8),
                       child: Text(
                         question['answer'],
-                        style:
-                            const TextStyle(fontSize: 14, color: Colors.black),
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.black,
+                          fontFamily: 'NotoSansMath',
+                        ),
                       ),
                     ),
                   ],

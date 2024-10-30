@@ -7,6 +7,7 @@ import 'package:yinsight/Screens/HomePage/views/home/home_screen.dart';
 import 'package:yinsight/Screens/Login_Signup/widgets/ForgetPassword.dart';
 import 'package:yinsight/Screens/Login_Signup/widgets/SignInScreen.dart';
 import 'package:yinsight/Screens/Login_Signup/widgets/SignUpScreen.dart';
+import 'package:yinsight/Screens/Onboarding/GifWithContinueScreen.dart';
 import 'package:yinsight/Screens/Onboarding/onboarding_controller.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:yinsight/navigationBar.dart';
@@ -69,7 +70,9 @@ class MyApp extends StatelessWidget {
       ),
 
       // Direct to MainNavigationScreen if a user is logged in
-      initialRoute: FirebaseAuth.instance.currentUser != null ? MainNavigationScreen.id : OnboardingController.id,
+      initialRoute: FirebaseAuth.instance.currentUser != null
+          ? MainNavigationScreen.id
+          : OnboardingController.id,
       onGenerateRoute: (settings) {
         if (settings.name == HomeScreen.id) {
           final args = settings.arguments as Function(int);
@@ -86,6 +89,7 @@ class MyApp extends StatelessWidget {
         SignInScreen.id: (context) => const SignInScreen(),
         SignUpScreen.id: (context) => const SignUpScreen(),
         // HomeScreen.id: (context) => const HomeScreen(),
+        GifWithContinueScreen.id: (context) => GifWithContinueScreen(),
         ForgetPasswordScreen.id: (context) => const ForgetPasswordScreen(),
         OnboardingController.id: (context) => const OnboardingController(),
       },

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:yinsight/Screens/Focus/views/focus.dart';
 import 'package:yinsight/Screens/HomePage/views/home/home_screen.dart';
+import 'package:yinsight/Screens/HomePage/widgets/settings.dart';
 import 'package:yinsight/Screens/Recall/views/recall_screen.dart';
 import 'package:yinsight/Screens/Reflection/CardScreen.dart';
 import 'package:yinsight/Screens/Streaks/StreaksPage.dart';
@@ -35,8 +36,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     const focusSection(),
     const Recall(),
     const CardScreen(),
-    // const SettingsScreen(),
     const StreaksPage(),
+    const SettingsScreen(),
   ];
 
   void _navigateToSection(int index) {
@@ -58,6 +59,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           Icon(Icons.lightbulb_outline, size: 30, color: Colors.white),
           Icon(Icons.book, size: 30, color: Colors.white),
           Icon(Icons.sentiment_satisfied_alt, size: 30, color: Colors.white),
+          Icon(Icons.calendar_month, size: 30, color: Colors.white),
           Icon(Icons.settings, size: 30, color: Colors.white),
         ],
         color: Colors.grey[800]!, // Ensure this is the desired color

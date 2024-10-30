@@ -9,7 +9,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:yinsight/Screens/Login_Signup/widgets/ForgetPassword.dart';
 import 'package:yinsight/Screens/Login_Signup/widgets/SignUpScreen.dart';
 import 'package:yinsight/Screens/Login_Signup/services/user_Authentication.dart';
-
+import 'package:yinsight/navigationBar.dart';
 
 /// A screen that allows users to sign in to their account.
 class SignInScreen extends StatefulWidget {
@@ -24,7 +24,7 @@ class _SignInScreenState extends State<SignInScreen> {
   final int _success = 1;
   int activeIndex = 0;
   Timer? _timer;
-  final user  = FirebaseAuth.instance.currentUser;
+  final user = FirebaseAuth.instance.currentUser;
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
@@ -54,17 +54,18 @@ class _SignInScreenState extends State<SignInScreen> {
   /// - If 'activeIndex' equals 3, it is reset back to 0.
   /// - The 'setState' function is called on each tick of the timer to update the state of 'activeIndex'.
   void startTimer() {
-      _timer = Timer.periodic(const Duration(seconds: 6), (timer) {
-        if (mounted) { // Check if the widget is still in the widget tree
-          setState(() {
-            activeIndex = activeIndex + 1;
+    _timer = Timer.periodic(const Duration(seconds: 6), (timer) {
+      if (mounted) {
+        // Check if the widget is still in the widget tree
+        setState(() {
+          activeIndex = activeIndex + 1;
 
-            if (activeIndex == 3) {
-              activeIndex = 0;
-            }
-          });
-        }
-      });
+          if (activeIndex == 3) {
+            activeIndex = 0;
+          }
+        });
+      }
+    });
   }
 
   /// Navigates to the sign-up screen.
@@ -77,8 +78,6 @@ class _SignInScreenState extends State<SignInScreen> {
     Navigator.of(context).pushNamed(ForgetPasswordScreen.id);
   }
 
-
-
   /// Creates a FadeInUp widget with a TextField as its child.
   ///
   /// [delay]: The delay before the animation starts, in milliseconds.
@@ -90,8 +89,14 @@ class _SignInScreenState extends State<SignInScreen> {
   /// [controller]: The controller for the TextField.
   ///
   /// Returns a FadeInUp widget.
-  FadeInUp fadeAnimation(int delay, int duration, TextInputType keyboardType,
-      String labelText, String hintText, IconData iconName, TextEditingController controller) {
+  FadeInUp fadeAnimation(
+      int delay,
+      int duration,
+      TextInputType keyboardType,
+      String labelText,
+      String hintText,
+      IconData iconName,
+      TextEditingController controller) {
     return FadeInUp(
       delay: Duration(milliseconds: delay),
       duration: Duration(milliseconds: duration),
@@ -136,11 +141,13 @@ class _SignInScreenState extends State<SignInScreen> {
       ),
     );
   }
+
   @override
   void dispose() {
-      _timer?.cancel(); // Cancel the timer
-      super.dispose();
+    _timer?.cancel(); // Cancel the timer
+    super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -179,13 +186,19 @@ class _SignInScreenState extends State<SignInScreen> {
               ),
               const SizedBox(height: 30),
               fadeAnimation(800, 170, TextInputType.emailAddress, 'Email',
-                  'Email', FontAwesomeIcons.user,emailController), // FadeInUp
+                  'Email', FontAwesomeIcons.user, emailController), // FadeInUp
               const SizedBox(
                 height: 20,
               ),
-              fadeAnimation(900, 270, TextInputType.visiblePassword, 'Password',
-                  'Password', FontAwesomeIcons.key,passwordController), // FadeInUp
-              
+              fadeAnimation(
+                  900,
+                  270,
+                  TextInputType.visiblePassword,
+                  'Password',
+                  'Password',
+                  FontAwesomeIcons.key,
+                  passwordController), // FadeInUp
+
               FadeInUp(
                 duration: const Duration(milliseconds: 1300),
                 delay: const Duration(milliseconds: 800),
@@ -226,7 +239,7 @@ class _SignInScreenState extends State<SignInScreen> {
                   },
                   height: 45,
                   padding:
-                  const EdgeInsets.symmetric(vertical: 10, horizontal: 50),
+                      const EdgeInsets.symmetric(vertical: 10, horizontal: 50),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
@@ -320,7 +333,6 @@ class _SignInScreenState extends State<SignInScreen> {
                         ),
                       ),
                     ),
-
                   ],
                 ),
               ),

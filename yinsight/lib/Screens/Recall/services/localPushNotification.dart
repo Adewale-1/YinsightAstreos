@@ -11,7 +11,6 @@ class NotificationService {
     // print('Notification created');
   }
 
-
   /// Method called when a notification is displayed.
   ///
   /// [receivedNotification]: The notification that was displayed.
@@ -23,11 +22,13 @@ class NotificationService {
   ///
   /// [receivedAction]: The action that dismissed the notification.
   @pragma("vm:entry-point")
-  static Future <void> onDismissActionReceivedMethod(ReceivedAction receivedAction) async {}
+  static Future<void> onDismissActionReceivedMethod(
+      ReceivedAction receivedAction) async {}
 
   /// Method called when an action is received from a notification.
   ///
   /// [receivedAction]: The action received from the notification.
   @pragma("vm:entry-point")
-  static Future <void> onActionReceivedMethod(ReceivedAction receivedAction) async {}
+  static Future<void> onActionReceivedMethod(
+      ReceivedAction receivedAction) async {}
 }
