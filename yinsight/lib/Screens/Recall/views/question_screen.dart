@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
+import 'package:flutter_tex/flutter_tex.dart';
 import 'package:http/http.dart' as http;
 import 'package:yinsight/Globals/services/userInfo.dart';
 
@@ -199,6 +200,79 @@ class _QuestionsScreenState extends State<QuestionsScreen>
     }
   }
 
+  // Widget _buildQuestionCard(Map<String, dynamic> question, int index) {
+  //   return Center(
+  //     child: Container(
+  //       margin: const EdgeInsets.all(8.0),
+  //       decoration: BoxDecoration(
+  //         color: Colors.grey[200],
+  //         borderRadius: BorderRadius.circular(8.0),
+  //         boxShadow: [
+  //           BoxShadow(
+  //             color: Colors.grey.withOpacity(0.5),
+  //             spreadRadius: 2,
+  //             blurRadius: 4,
+  //             offset: const Offset(0, 3),
+  //           ),
+  //         ],
+  //       ),
+  //       height: 450,
+  //       width: 350,
+  //       child: SingleChildScrollView(
+  //         child: Padding(
+  //           padding: const EdgeInsets.all(16),
+  //           child: Column(
+  //             crossAxisAlignment: CrossAxisAlignment.start,
+  //             children: [
+  //               Text(
+  //                 'Question ${index + 1}',
+  //                 style: const TextStyle(
+  //                   fontSize: 18,
+  //                   fontWeight: FontWeight.bold,
+  //                   color: Colors.blue,
+  //                 ),
+  //               ),
+  //               const SizedBox(height: 8),
+  //               Text(
+  //                 question['question'],
+  //                 style: const TextStyle(
+  //                   fontSize: 16,
+  //                   color: Colors.black,
+  //                   fontFamily: 'NotoSansMath',
+  //                 ),
+  //               ),
+  //               const SizedBox(height: 16),
+  //               ExpansionTile(
+  //                 key: Key('expansionTile_$index'), // Add this line
+  //                 title: const Text(
+  //                   'Show Answer',
+  //                   style: TextStyle(
+  //                     color: Colors.blue,
+  //                     fontWeight: FontWeight.bold,
+  //                   ),
+  //                 ),
+  //                 children: [
+  //                   Padding(
+  //                     padding: const EdgeInsets.all(8),
+  //                     child: Text(
+  //                       question['answer'],
+  //                       style: const TextStyle(
+  //                         fontSize: 14,
+  //                         color: Colors.black,
+  //                         fontFamily: 'NotoSansMath',
+  //                       ),
+  //                     ),
+  //                   ),
+  //                 ],
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
+
   Widget _buildQuestionCard(Map<String, dynamic> question, int index) {
     return Center(
       child: Container(
@@ -232,17 +306,19 @@ class _QuestionsScreenState extends State<QuestionsScreen>
                   ),
                 ),
                 const SizedBox(height: 8),
-                Text(
-                  question['question'],
-                  style: const TextStyle(
-                    fontSize: 16,
-                    color: Colors.black,
-                    fontFamily: 'NotoSansMath',
+                TeXView(
+                  child: TeXViewDocument(
+                    question[
+                        'question'], // Ensure question text is in LaTeX format if needed
+                    style: TeXViewStyle(
+                      contentColor: Colors.black,
+                      fontStyle: TeXViewFontStyle(fontSize: 16),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 16),
                 ExpansionTile(
-                  key: Key('expansionTile_$index'), // Add this line
+                  key: Key('expansionTile_$index'),
                   title: const Text(
                     'Show Answer',
                     style: TextStyle(
@@ -253,12 +329,14 @@ class _QuestionsScreenState extends State<QuestionsScreen>
                   children: [
                     Padding(
                       padding: const EdgeInsets.all(8),
-                      child: Text(
-                        question['answer'],
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: Colors.black,
-                          fontFamily: 'NotoSansMath',
+                      child: TeXView(
+                        child: TeXViewDocument(
+                          question[
+                              'answer'], // Ensure answer text is in LaTeX format if needed
+                          style: TeXViewStyle(
+                            contentColor: Colors.black,
+                            fontStyle: TeXViewFontStyle(fontSize: 14),
+                          ),
                         ),
                       ),
                     ),

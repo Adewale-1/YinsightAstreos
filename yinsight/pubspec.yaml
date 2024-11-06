@@ -79,6 +79,7 @@ dependencies:
   flutter_math_fork: ^0.7.2
   video_player: ^2.9.2
   cached_network_image: any
+  flutter_tex: ^4.0.9
   
 dev_dependencies:
   flutter_test:
